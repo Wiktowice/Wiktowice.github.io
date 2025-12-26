@@ -170,31 +170,16 @@ audio.addEventListener('ended', () => {
 // Set initial volume
 audio.volume = volumeSlider.value;
 
-// Autoplay logic and interaction fallback
-const initAutoplay = () => {
-    audio.play()
-        .then(() => {
-            updateUI(true);
-            removeInteractionListeners();
-        })
-        .catch(() => {
-            // Wait for user interaction if autoplay is blocked
-            console.log("Autoplay failed, waiting for interaction.");
-        });
-};
-
-const removeInteractionListeners = () => {
-    document.removeEventListener('click', initAutoplay);
-    document.removeEventListener('touchstart', initAutoplay);
-};
-
-document.addEventListener('click', initAutoplay);
-document.addEventListener('touchstart', initAutoplay);
-
-// Try immediately on load
+/* Autoplay removed: playback starts only via the play button.
+   Start polling track info once the page loads. */
 window.addEventListener('load', () => {
-    initAutoplay();
     startTrackPolling();
+    // Attempt autoplay on load; update UI if successful
+    audio.play().then(() => {
+        updateUI(true);
+    }).catch(err => {
+        console.log('Autoplay failed:', err);
+    });
 });
 
 // Add a simple visual feedback for logo click
