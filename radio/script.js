@@ -170,16 +170,68 @@ audio.addEventListener('ended', () => {
 // Set initial volume
 audio.volume = volumeSlider.value;
 
-/* Autoplay removed: playback starts only via the play button.
-   Start polling track info once the page loads. */
+ // Start polling track info once the page loads and handle autoplay fallback.
 window.addEventListener('load', () => {
     startTrackPolling();
-    // Attempt autoplay on load; update UI if successful
-    audio.play().then(() => {
-        updateUI(true);
-    }).catch(err => {
-        console.log('Autoplay failed:', err);
+
+    // Strategy: start muted playback immediately (muted autoplay is allowed in most browsers),
+    // then keep retrying play() while muted every few seconds and on visibilitychange.
+    // Once play() succeeds, unmute and update UI.
+    audio.muted = true; // ensure muted so autoplay is more likely to succeed
+    let retryHandle = null;
+    const RETRY_INTERVAL = 3000;
+
+    async function tryPlayOnce() {
+        try {
+            await audio.play();
+            // playback started (muted). Unmute after a short fade to avoid abruptness.
+            audio.muted = false;
+            updateUI(true);
+            if (retryHandle) {
+                clearInterval(retryHandle);
+                retryHandle = null;
+            }
+            document.removeEventListener('visibilitychange', onVisibility);
+        } catch (err) {
+            // still blocked; will retry
+            // console.debug('play() blocked, will retry', err);
+        }
+    }
+
+    // Visibility handler: attempt to play when page becomes visible
+    function onVisibility() {
+        if (document.visibilityState === 'visible') {
+            tryPlayOnce();
+        }
+    }
+
+    // Start immediate attempt, then schedule retries if needed
+    tryPlayOnce().then(() => {
+        // if first attempt failed, schedule retries
+        if (!isPlaying && !retryHandle) {
+            retryHandle = setInterval(tryPlayOnce, RETRY_INTERVAL);
+            document.addEventListener('visibilitychange', onVisibility);
+        }
     });
+
+    // As a final measure also attempt to play when the user focuses or interacts in any way
+    // without showing UI -- this keeps interaction minimal but helps when browsers require a gesture.
+    const minimalInteraction = () => {
+        tryPlayOnce();
+    };
+    window.addEventListener('focus', minimalInteraction);
+    window.addEventListener('mousemove', minimalInteraction);
+    window.addEventListener('keydown', minimalInteraction, { once: true });
+
+    // Clean up listeners when we successfully start playing
+    const checkStarted = setInterval(() => {
+        if (isPlaying) {
+            window.removeEventListener('focus', minimalInteraction);
+            window.removeEventListener('mousemove', minimalInteraction);
+            window.removeEventListener('keydown', minimalInteraction);
+            clearInterval(checkStarted);
+        }
+    }, 500);
 });
 
 // Add a simple visual feedback for logo click
