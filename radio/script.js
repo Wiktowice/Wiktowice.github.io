@@ -5,6 +5,7 @@ const logo = document.getElementById('logo');
 const volumeSlider = document.getElementById('volume-slider');
 const progressBar = document.getElementById('progress-bar');
 const progressContainer = document.getElementById('progress-container');
+const autoplayOverlay = document.getElementById('autoplay-overlay');
 
 // SVG markup for play / pause states
 const PLAY_SVG = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -28,11 +29,10 @@ const TRACK_API = 'https://api.radioking.io/widget/radio/radio-wiktowickie/track
 function updateUI(playing) {
     isPlaying = playing;
     if (playing) {
-        // show pause svg when playing
         playIcon.innerHTML = PAUSE_SVG;
         logo.classList.add('playing');
+        autoplayOverlay.setAttribute('aria-hidden', 'true');
     } else {
-        // show play svg when paused
         playIcon.innerHTML = PLAY_SVG;
         logo.classList.remove('playing');
     }
@@ -43,16 +43,35 @@ function togglePlay() {
     if (isPlaying) {
         pauseAudio();
     } else {
-        playAudio();
+        // If overlay visible, hide it and start
+        if (autoplayOverlay.getAttribute('aria-hidden') === 'false') {
+            autoplayOverlay.setAttribute('aria-hidden', 'true');
+        }
+        playAudio(true);
     }
 }
 
-function playAudio() {
-    audio.play().then(() => {
+async function playAudio(userInitiated = false) {
+    try {
+        // try to play; keep muted=false only if userInitiated or autoplay succeeded
+        if (!userInitiated) {
+            audio.muted = true; // allow muted autoplay attempts
+        }
+        await audio.play();
+        // If autoplayed silently, unmute gently
+        if (!userInitiated) {
+            // small delay to avoid abrupt sound
+            setTimeout(() => { audio.muted = false; }, 300);
+        } else {
+            audio.muted = false;
+        }
         updateUI(true);
-    }).catch(error => {
-        console.log("Odtwarzanie zablokowane przez przeglądarkę. Czekam na interakcję.");
-    });
+        return true;
+    } catch (err) {
+        // blocked by browser
+        console.log('Autoplay blocked:', err);
+        return false;
+    }
 }
 
 function pauseAudio() {
@@ -64,13 +83,11 @@ function pauseAudio() {
 function updateProgress(e) {
     if (isPlaying) {
         const { duration, currentTime } = e.srcElement;
-        // Check if it's a live stream (Infinity duration)
         if (duration && isFinite(duration)) {
             const progressPercent = (currentTime / duration) * 100;
             progressBar.style.width = `${progressPercent}%`;
             progressContainer.style.display = 'block';
         } else {
-            // Live stream handling
             progressBar.style.width = '100%';
             progressContainer.style.display = 'none';
         }
@@ -90,7 +107,6 @@ function setProgress(e) {
  // Volume control
  function handleVolumeChange() {
      audio.volume = volumeSlider.value;
-     // Optional: adjust visual emphasis between low/high icons
      const volLow = document.getElementById('vol-low');
      const volHigh = document.getElementById('vol-high');
      const v = parseFloat(volumeSlider.value);
@@ -112,38 +128,28 @@ async function fetchCurrentTrack() {
         const res = await fetch(TRACK_API, {cache: "no-store"});
         if (!res.ok) throw new Error('Network response not ok');
         const data = await res.json();
-
-        // Radioking widget returns structure like: { track: { title, artist, cover } } or similar.
-        // We'll attempt to safely read common fields.
         const track = data.track || data.currentTrack || data.song || data;
         const title = track.title || track.name || track.trackTitle || '';
         const artist = track.artist || track.artists || track.author || '';
         let cover = track.cover || track.picture || track.artwork || '';
-
-        // Radioking sometimes returns full URLs or objects - if object, try to get url property
         if (typeof cover === 'object' && cover !== null) {
             cover = cover.url || cover.src || '';
         }
-
         updateTrackUI(title, artist, cover);
     } catch (err) {
-        // On error, keep existing UI but mark as unavailable
         console.log('Błąd pobierania aktualnego utworu:', err);
         trackTitleEl.textContent = 'Brak danych';
         trackArtistEl.textContent = '';
-        // don't change cover on transient errors
     }
 }
 
 function updateTrackUI(title, artist, cover) {
     trackTitleEl.textContent = title || 'Nieznany tytuł';
-    // If no cover provided, treat artist as unknown and use fallback icon
     if (!cover) {
         trackArtistEl.textContent = 'Nieznany autor';
         trackCoverEl.src = 'brakikony.png';
     } else {
         trackArtistEl.textContent = artist || '';
-        // Use cover directly; for security browsers will fetch it.
         trackCoverEl.src = cover;
     }
 }
@@ -156,7 +162,7 @@ function startTrackPolling() {
 }
 
 // Event Listeners
-playBtn.addEventListener('click', togglePlay);
+playBtn.addEventListener('click', () => togglePlay());
 audio.addEventListener('timeupdate', updateProgress);
 progressContainer.addEventListener('click', setProgress);
 volumeSlider.addEventListener('input', handleVolumeChange);
@@ -170,68 +176,73 @@ audio.addEventListener('ended', () => {
 // Set initial volume
 audio.volume = volumeSlider.value;
 
- // Start polling track info once the page loads and handle autoplay fallback.
+// Autoplay handling + overlay fallback
 window.addEventListener('load', () => {
     startTrackPolling();
 
-    // Strategy: start muted playback immediately (muted autoplay is allowed in most browsers),
-    // then keep retrying play() while muted every few seconds and on visibilitychange.
-    // Once play() succeeds, unmute and update UI.
-    audio.muted = true; // ensure muted so autoplay is more likely to succeed
+    // immediate muted attempt (allowed in many browsers)
     let retryHandle = null;
     const RETRY_INTERVAL = 3000;
+    let attempts = 0;
+    const MAX_AUTOPLAY_ATTEMPTS = 6;
 
-    async function tryPlayOnce() {
-        try {
-            await audio.play();
-            // playback started (muted). Unmute after a short fade to avoid abruptness.
-            audio.muted = false;
-            updateUI(true);
+    async function attemptAutoplay() {
+        attempts++;
+        const ok = await playAudio(false);
+        if (ok) {
             if (retryHandle) {
                 clearInterval(retryHandle);
                 retryHandle = null;
             }
-            document.removeEventListener('visibilitychange', onVisibility);
-        } catch (err) {
-            // still blocked; will retry
-            // console.debug('play() blocked, will retry', err);
+            return;
+        }
+        if (attempts >= MAX_AUTOPLAY_ATTEMPTS) {
+            // Show overlay prompting a simple click/tap to start (works on GitHub Pages too)
+            autoplayOverlay.setAttribute('aria-hidden', 'false');
+            if (retryHandle) {
+                clearInterval(retryHandle);
+                retryHandle = null;
+            }
+        } else {
+            if (!retryHandle) {
+                retryHandle = setInterval(attemptAutoplay, RETRY_INTERVAL);
+            }
         }
     }
 
-    // Visibility handler: attempt to play when page becomes visible
-    function onVisibility() {
-        if (document.visibilityState === 'visible') {
-            tryPlayOnce();
-        }
-    }
+    attemptAutoplay();
 
-    // Start immediate attempt, then schedule retries if needed
-    tryPlayOnce().then(() => {
-        // if first attempt failed, schedule retries
-        if (!isPlaying && !retryHandle) {
-            retryHandle = setInterval(tryPlayOnce, RETRY_INTERVAL);
-            document.addEventListener('visibilitychange', onVisibility);
+    // When user interacts with the overlay, start playback with user gesture (unmuted)
+    const startFromOverlay = async (e) => {
+        e.preventDefault();
+        autoplayOverlay.setAttribute('aria-hidden', 'true');
+        const ok = await playAudio(true);
+        if (!ok) {
+            // if still blocked, show overlay again
+            autoplayOverlay.setAttribute('aria-hidden', 'false');
+        }
+    };
+    autoplayOverlay.addEventListener('click', startFromOverlay, { once: true });
+    autoplayOverlay.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            startFromOverlay(e);
         }
     });
 
-    // As a final measure also attempt to play when the user focuses or interacts in any way
-    // without showing UI -- this keeps interaction minimal but helps when browsers require a gesture.
-    const minimalInteraction = () => {
-        tryPlayOnce();
-    };
-    window.addEventListener('focus', minimalInteraction);
-    window.addEventListener('mousemove', minimalInteraction);
-    window.addEventListener('keydown', minimalInteraction, { once: true });
+    // Try again when page becomes visible
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') attemptAutoplay();
+    });
 
-    // Clean up listeners when we successfully start playing
-    const checkStarted = setInterval(() => {
-        if (isPlaying) {
-            window.removeEventListener('focus', minimalInteraction);
-            window.removeEventListener('mousemove', minimalInteraction);
-            window.removeEventListener('keydown', minimalInteraction);
-            clearInterval(checkStarted);
+    // Also allow quick user gesture anywhere to start (helps on some restrictive browsers)
+    const quickStart = async () => {
+        const ok = await playAudio(true);
+        if (ok) {
+            autoplayOverlay.setAttribute('aria-hidden', 'true');
+            window.removeEventListener('pointerdown', quickStart);
         }
-    }, 500);
+    };
+    window.addEventListener('pointerdown', quickStart, { once: true });
 });
 
 // Add a simple visual feedback for logo click
