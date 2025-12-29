@@ -3,18 +3,19 @@ document.addEventListener("DOMContentLoaded", function(){
     let users = [];
 
     // Wczytaj konto.json z Neocities
-    fetch('konto.json')
-      .then(res => res.text())
-      .then(txt => {
-          try {
-              users = JSON.parse(txt);
-              if(!Array.isArray(users)) throw "konto.json nie jest tablicą!";
-              console.log("Konta wczytane:", users);
-          } catch(e) {
-              console.error("Błąd parsowania JSON:", e);
-          }
-      })
-      .catch(err => console.error("Błąd wczytywania kont:", err));
+fetch('konto.json')
+  .then(res => res.text())
+  .then(txt => {
+      try {
+          users = JSON.parse(txt);
+          if(!Array.isArray(users)) throw "konto.json nie jest tablicą!";
+          // console.log("Konta wczytane:", users); // ← usuń lub zakomentuj
+          console.log("Konta wczytane pomyślnie."); // bez wyświetlania haseł
+      } catch(e) {
+          console.error("Błąd parsowania JSON:", e);
+      }
+  })
+  .catch(err => console.error("Błąd wczytywania kont:", err));
 
     // Dźwięk kliknięcia
     function playClick(){ 
@@ -102,3 +103,4 @@ document.addEventListener("DOMContentLoaded", function(){
     }
 
 });
+
