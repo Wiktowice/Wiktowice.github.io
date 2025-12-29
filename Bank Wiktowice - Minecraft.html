@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- saved from url=(0036)https://rajman03.neocities.org/bank/ -->
+<html lang="pl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bank Wiktowice - Minecraft</title>
+<link rel="stylesheet" href="./Bank Wiktowice - Minecraft_files/style.css">
+</head>
+<body>
+<div class="topbar">
+    <img src="./Bank Wiktowice - Minecraft_files/logobank.png" class="logo">
+    <a href="https://wiktowice.neocities.org/" target="_blank">Strona główna</a>
+    <a href="https://rajman03.neocities.org/bank/admin.html">Admin Panel</a>
+</div>
+
+<div id="login-window" class="window animated-window">
+    <h1 class="animated-title">Bank Wiktowice</h1>
+    <input type="text" id="login" placeholder="Login">
+    <input type="password" id="password" placeholder="Hasło">
+    <button onclick="playClick(); login()">Zaloguj</button>
+    <p id="login-error" class="error"></p>
+</div>
+
+<div id="account-window" class="window animated-window" style="display:none;">
+    <h1 class="animated-title">Witaj, <span id="user-name"></span>!</h1>
+    <p>ID konta: <span id="user-id"></span></p>
+    <p>Saldo: <span id="user-saldo"></span></p>
+    <button onclick="playClick(); logout()">Wyloguj</button>
+</div>
+
+<audio id="click-sound" src="click.wav"></audio>
+<script src="./Bank Wiktowice - Minecraft_files/script.js.pobierz"></script>
+
+
+</body></html>
