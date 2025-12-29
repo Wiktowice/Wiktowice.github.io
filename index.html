@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<!-- saved from url=(0031)https://rajman03.neocities.org/ -->
-<html lang="pl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="manifest" href="https://rajman03.neocities.org/manifest.json">
+<html lang="pl">
+<head>
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff00">
-
-<link rel="apple-touch-icon" sizes="180x180" href="https://rajman03.neocities.org/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://rajman03.neocities.org/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="https://rajman03.neocities.org/favicon-16x16.png">
-<link rel="manifest" href="https:/wiktowice.neocities.org/site.webmanifest">
+<meta charset="UTF-8">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Wiktowice - Miasto na Modach. Dołącz do serwera Minecraft na modach, sprawdź mapę, aktualności, bank i nasz Discord!">
 <title>Wiktowice - Miasto na Modach</title>
@@ -118,18 +118,18 @@ footer {
 <header>
     <img src="logo.png" alt="Wiktowice Logo">
     <nav>
-        <a href="https://wiktowice.github.io/index.html">Strona główna</a>
-        <a href="https://wiktowice.github.io/#o-serwerze">O serwerze</a>
-        <a href="https://wiktowice.github.io/#aktualnosci">Aktualności</a>
-        <a href="https://wiktowice.github.io/bank">Bank</a>
+        <a href="index.html">Strona główna</a>
+        <a href="#o-serwerze">O serwerze</a>
+        <a href="#aktualnosci">Aktualności</a>
+        <a href="https://wiktowice.neocities.org/bank">Bank</a>
         <a href="https://dc.gg/Wiktowice">Discord</a>
-        <a href="https://wiktowice.github.io/idea">IDEA Centertel</a>
+        <a href="https://wiktowice.neocities.org/idea">IDEA Centertel</a>
         <a href="https://wiktowice.github.io/radio">Radio</a>
-        <a href="https://wiktowice.github.io/admin.html" class="btn">🛠 Panel Admina</a>
+        <a href="admin.html" class="btn">🛠 Panel Admina</a>
     </nav>
 </header>
 
-<div class="banner" onclick="window.location.href=&#39;https://wiktowice.falixsrv.me:35894/&#39;">
+<div class="banner" onclick="window.location.href='https://wiktowice.falixsrv.me:35894/'">
     <div class="banner-text-container">
         <div class="banner-text">Wiktowice – Miasto na Modach</div>
     </div>
@@ -141,21 +141,22 @@ footer {
     <p>Kliknij w banner powyżej, aby zobaczyć mapę świata.</p>
 <p>
 Kliknij 
-<span style="color:blue; text-decoration:underline; cursor:pointer;" onclick="
-Notification.requestPermission().then(p=&gt;{
-    if(p!==&#39;granted&#39;){ alert(&#39;Nie włączono powiadomień&#39;); return; }
+<span style="color:blue; text-decoration:underline; cursor:pointer;"
+      onclick="
+Notification.requestPermission().then(p=>{
+    if(p!=='granted'){ alert('Nie włączono powiadomień'); return; }
 
     // Dane newsów inline (zamiast fetch)
     const news = [
-        { title: &#39;ae&#39;, date: &#39;2025-10-03&#39;, content: &#39;ae&#39; },
-        { title: &#39;to jest test.&#39;, date: &#39;2025-10-13&#39;, content: &#39;to jest test.&#39; }
+        { title: 'ae', date: '2025-10-03', content: 'ae' },
+        { title: 'to jest test.', date: '2025-10-13', content: 'to jest test.' }
     ];
 
     // Pobieramy ostatni news
     const latest = news[news.length-1];
 
     // Wyświetlamy powiadomienie natychmiast
-    new Notification(latest.title, { body: latest.content, icon: &#39;favicon-32x32.png&#39; });
+    new Notification(latest.title, { body: latest.content, icon: 'favicon-32x32.png' });
 })">
 tutaj
 </span> aby włączyć powiadomienia.
@@ -179,11 +180,11 @@ tutaj
 
 <section id="aktualnosci">
     <h2>Aktualności</h2>
-    <div id="news-container"><p>Brak aktualności lub błąd ładowania JSON.</p></div>
+    <div id="news-container"></div>
 </section>
 
 <footer>
-    © 2025 Wiktowice. Wszystkie prawa zastrzeżone.
+    &copy; 2025 Wiktowice. Wszystkie prawa zastrzeżone.
 </footer>
 
 <script>
@@ -262,6 +263,5 @@ if ('serviceWorker' in navigator) {
     .catch(e => console.error('Błąd rejestracji SW:', e));
 }
 </script>
-
-
-</body></html>
+</body>
+</html>
