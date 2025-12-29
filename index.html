@@ -121,9 +121,9 @@ footer {
         <a href="index.html">Strona główna</a>
         <a href="#o-serwerze">O serwerze</a>
         <a href="#aktualnosci">Aktualności</a>
-        <a href="https://wiktowice.neocities.org/bank">Bank</a>
+        <a href="https://wiktowice.github.io/bank">Bank</a>
         <a href="https://dc.gg/Wiktowice">Discord</a>
-        <a href="https://wiktowice.neocities.org/idea">IDEA Centertel</a>
+        <a href="https://wiktowice.github.io/idea">IDEA Centertel</a>
         <a href="https://wiktowice.github.io/radio">Radio</a>
         <a href="admin.html" class="btn">🛠 Panel Admina</a>
     </nav>
@@ -224,7 +224,7 @@ let ostatniNews = null;
 
 // Funkcja sprawdzająca nowe wiadomości
 function sprawdzNoweNews() {
-    fetch('https://wiktowice.neocities.org/news.json')
+    fetch('https://wiktowice.github.io/news.json')
         .then(res => {
             if (!res.ok) throw new Error("Nie można wczytać news.json");
             return res.json();
@@ -243,7 +243,7 @@ function sprawdzNoweNews() {
 
 // Sprawdzaj co 30 sekund (możesz zmienić interwał)
 setInterval(sprawdzNoweNews, 30000);
-fetch('https://wiktowice.neocities.org/news.json')
+fetch('https://wiktowice.github.io/news.json')
 .then(response => response.json())
 .then(data => {
     const container = document.getElementById('news-container');
@@ -265,3 +265,4 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
