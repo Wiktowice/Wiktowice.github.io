@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tablica Zamówień — Restauracja</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f2614;--accent:#8fbf3b;--muted:#cbd5c1;--card:#14281a;}
+html,body{height:100%;margin:0;font-family:'Press Start 2P',monospace;background:linear-gradient(180deg,var(--bg),#073018);color:var(--muted)}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(0,0,0,0.08) 1px, transparent 1px),linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px);background-size:16px 16px,16px 16px;opacity:.35;pointer-events:none}
+.wrap{max-width:700px;margin:20px auto;padding:20px;border-radius:12px;background:rgba(0,0,0,0.1);border:4px solid rgba(0,0,0,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+h1{text-align:center;font-size:18px;color:#aed39a}
+ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+li{padding:12px;border-radius:10px;background:var(--card);border:2px solid rgba(0,0,0,0.35);display:flex;justify-content:space-between;align-items:center}
+.num{color:var(--accent)}
+.status{font-size:10px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Tablica Zamówień</h1>
+<ul id="orders"></ul>
+</div>
+<script>
+async function loadOrders(){
+try{
+const res=await fetch('orders.json?cache='+Date.now());
+const data=await res.json();
+const list=document.getElementById('orders');
+list.innerHTML='';
+if(!data.length){list.innerHTML='<li style="justify-content:center">Brak zamówień</li>';return;}
+data.forEach(o=>{
+const li=document.createElement('li');
+li.innerHTML=`<span class=\"num\">${o.number}</span><span class=\"status\">${o.status}</span>`;
+list.appendChild(li);
+});
+}catch(e){console.error(e);}
+}
+loadOrders();
+setInterval(loadOrders,15000);
+</script>
+</body>
+</html>
