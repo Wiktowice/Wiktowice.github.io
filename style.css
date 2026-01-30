@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    /* Minecraft Palette */
+    --mc-dirt: #8b4513;
+    /* Podzol/Dirt */
+    --mc-grass-top: #7ec850;
+    /* Lime grass */
+    --mc-grass-side: #5b8731;
+    --mc-stone: #7d7d7d;
+    /* Stone GUI */
+    --mc-stone-light: #c6c6c6;
+    --mc-stone-dark: #373737;
+    --mc-wood: #654321;
+    --mc-wood-light: #8f5e2e;
+    --mc-wood-shadow: #3e2712;
+    --mc-text: #ffffff;
+    --mc-text-shadow: #3f3f3f;
+    --mc-link: #55aaff;
+    --mc-btn-hover: #3a220f;
+
+    /* Dimensions */
+    --pixel-size: 2px;
+    /* Scale variable for "pixel" look */
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Press Start 2P', cursive;
+    background: #111 url('tlo.png') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--mc-text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+    text-shadow: 2px 2px 0 var(--mc-text-shadow);
+}
+
+a {
+    text-decoration: none;
+    color: var(--mc-text);
+}
+
+/* --- MINECRAFT GUI CONTAINER --- */
+.mc-container {
+    background-color: #c6c6c6;
+    border: 4px solid #000;
+    border-top-color: #fff;
+    border-left-color: #fff;
+    border-right-color: #555;
+    border-bottom-color: #555;
+    box-shadow: 4px 4px 0 #000, inset 2px 2px 0 #dfdfdf, inset -2px -2px 0 #8b8b8b;
+    padding: 2px;
+}
+
+.mc-panel {
+    background-color: rgba(30, 30, 30, 0.85);
+    /* Darkened glass style for contrast */
+    border: 4px solid;
+    border-image-slice: 1;
+    border-width: 4px;
+    border-image-source: linear-gradient(to bottom right, #555, #111);
+    box-shadow: 0 0 0 2px #000;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* --- HEADER --- */
+header {
+    background: linear-gradient(to bottom, var(--mc-grass-top) 50%, var(--mc-grass-side) 50%, var(--mc-dirt) 100%);
+    background-size: 100% 40px;
+    /* Pixelated stripe */
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 6px solid #3e2712;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header img.logo {
+    height: 64px;
+    width: auto;
+    image-rendering: pixelated;
+    filter: drop-shadow(4px 4px 0 #000);
+    transition: transform 0.2s;
+}
+
+header img.logo:hover {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+nav {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* --- MC BUTTONS --- */
+.mc-btn {
+    position: relative;
+    display: inline-block;
+    background-color: #7d7d7d;
+    padding: 10px 20px;
+    font-size: 12px;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 2px 2px #333;
+    border: 3px solid #000;
+    /* CSS Bevel */
+    box-shadow: inset 3px 3px 0 rgba(255, 255, 255, 0.4), inset -3px -3px 0 rgba(0, 0, 0, 0.4), 3px 3px 0 #000;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.mc-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+}
+
+.mc-btn:hover {
+    background-color: #8e8e8e;
+}
+
+.mc-btn.purple {
+    background-color: #a020f0;
+}
+
+.mc-btn.gold {
+    background-color: #FFAA00;
+    color: #3e2712;
+    text-shadow: none;
+}
+
+.mc-btn.red {
+    background-color: #aa0000;
+}
+
+.mc-btn.green {
+    background-color: #00aa00;
+}
+
+/* --- HERO BANNER --- */
+.hero {
+    position: relative;
+    height: 400px;
+    background: #000;
+    border-bottom: 6px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('mapa.png') center/cover no-repeat;
+    opacity: 0.8;
+    transition: transform 10s linear;
+}
+
+.hero:hover .hero-bg {
+    transform: scale(1.05);
+}
+
+.hero-title-box {
+    position: relative;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border: 4px solid #fff;
+    text-align: center;
+    box-shadow: 0 0 20px #000;
+}
+
+.hero h1 {
+    font-size: 24px;
+    color: #FFAA00;
+    margin: 0;
+    text-shadow: 3px 3px 0 #3e2712;
+}
+
+/* --- SECTIONS --- */
+main {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+section {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 20px;
+    background: #444;
+    display: inline-block;
+    padding: 10px 20px;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+    transform: skew(-10deg);
+}
+
+.section-title span {
+    display: block;
+    transform: skew(10deg);
+    /* Counter skew */
+}
+
+/* --- SERVER IP BOX --- */
+.ip-box {
+    background: #000;
+    color: #55ff55;
+    font-family: monospace;
+    padding: 15px;
+    border: 2px dashed #55ff55;
+    text-align: center;
+    margin: 20px 0;
+    cursor: pointer;
+    position: relative;
+    word-break: break-all;
+    /* Ensure long IPs don't break layout */
+    transition: all 0.3s;
+}
+
+.ip-box:hover::after {
+    content: "KLIKNIJ ABY SKOPIOWAĆ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 255, 0, 0.9);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* --- FOOTER --- */
+footer {
+    background: #1a1a1a;
+    border-top: 4px solid #555;
+    padding: 40px;
+    text-align: center;
+    color: #888;
+    font-size: 10px;
+}
+
+/* --- UTILS --- */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 800px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    nav {
+        width: 100%;
+    }
+}

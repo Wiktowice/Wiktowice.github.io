@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; media-src 'self'; connect-src 'self' http://localhost:3000 https://*.supabase.co https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;">
+    <title>Wiktowice Admin OS 2.1</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h1 class="pixel-font" style="color: var(--primary); margin-bottom: 20px; font-size: 24px;">SYSTEM ADMIN
+            </h1>
+            <p style="margin-bottom: 30px; color: #888;">Wiktowice Secure Access Hub</p>
+            <div class="form-group">
+                <input type="password" id="login-pass" placeholder="Enter Access Code..."
+                    style="text-align: center; font-size: 18px; letter-spacing: 2px;">
+            </div>
+            <button class="btn" id="login-btn" style="width: 100%; justify-content: center;">LOGIN</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-container">
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="pixel-font" style="font-size: 18px; color: #fff;">Wiktowice</div>
+                <div style="font-size: 11px; color: #666; margin-top: 5px;">Admin OS v2.1</div>
+            </div>
+
+            <div class="nav-item active" data-view="dashboard">
+                <span>🏠</span> Dashboard
+            </div>
+            <div class="nav-item" data-view="news">
+                <span>📰</span> Aktualności
+            </div>
+            <div class="nav-item" data-view="bank">
+                <span>💰</span> Bank Centralny
+            </div>
+            <div class="nav-item" data-view="restaurant">
+                <span>🍔</span> Restauracja
+            </div>
+            <div class="nav-item" data-view="config">
+                <span>⚙️</span> Konfiguracja
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="index.html"
+                    style="color:#888; text-decoration:none; display:block; margin-bottom:10px; transition: color 0.2s;">
+                    &larr; Wróć na stronę
+                </a>
+                <div style="opacity: 0.5;">&copy; 2025 Rajman03</div>
+            </div>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="main-content">
+
+            <!-- DASHBOARD VIEW -->
+            <section id="view-dashboard" class="view-section active">
+                <header
+                    style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:1px solid #333; padding-bottom:20px;">
+                    <div>
+                        <h2 class="pixel-font" style="margin:0; font-size:24px;">Przegląd Systemu</h2>
+                        <p style="margin:5px 0 0; color:#888;">Centrum dowodzenia i statystyki.</p>
+                    </div>
+                    <div id="stats-status"
+                        style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--success); padding:5px 10px; background:rgba(16, 185, 129, 0.1); border-radius:4px;">
+                        ● SYSTEM ONLINE
+                    </div>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📰</div>
+                        <h3>Aktualności</h3>
+                        <div class="stat-number" id="stats-news-count">-</div>
+                        <button class="btn btn-secondary" onclick="navTo('news')">Zarządzaj &rarr;</button>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <h3>Klienci Banku</h3>
+                        <div class="stat-number" id="stats-bank-count">-</div>
+                        <button class="btn btn-secondary" onclick="navTo('bank')">Zarządzaj &rarr;</button>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🍽️</div>
+                        <h3>Zamówienia</h3>
+                        <div class="stat-number" id="stats-orders-count">-</div>
+                        <button class="btn btn-secondary" onclick="navTo('restaurant')">Zarządzaj &rarr;</button>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h3 class="pixel-font" style="font-size:14px; margin-bottom:15px;">Szybkie Akcje</h3>
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn" onclick="loadAllData()">🔄 Odśwież Dane</button>
+                        <button class="btn btn-secondary" onclick="alert('Wersja panelu: 2.1 (Premium)')">ℹ️
+                            Info</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEWS VIEW -->
+            <section id="view-news" class="view-section">
+                <div class="action-header">
+                    <div>
+                        <h2 class="pixel-font" style="font-size:20px; margin:0;">Aktualności</h2>
+                        <p style="margin:5px 0 0; color:#888; font-size:12px;">Zarządzaj postami na stronie głównej</p>
+                    </div>
+                    <div class="controls-group">
+                        <button class="btn" onclick="openModal('news')">➕ Nowy Post</button>
+                        <button class="btn-icon" onclick="loadFile('news')" title="Wczytaj z serwera">📥</button>
+                    </div>
+                </div>
+
+                <div class="split-view">
+                    <div class="table-wrapper">
+                        <table id="table-news">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortData('news', 'date')">Data ↕</th>
+                                    <th onclick="sortData('news', 'title')">Tytuł ↕</th>
+                                    <th style="width: 100px;">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="json-panel">
+                        <label>Eksport JSON</label>
+                        <textarea id="json-news" class="code-editor" readonly></textarea>
+                        <button class="btn" style="width:100%; margin-top:auto;"
+                            onclick="copyToClipboard('json-news')">📋 Kopiuj Kod</button>
+                        <button class="btn btn-secondary" style="width:100%; margin-top:10px;"
+                            onclick="downloadJSON('news')">💾 Pobierz Plik</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BANK VIEW -->
+            <section id="view-bank" class="view-section">
+                <div class="action-header">
+                    <div>
+                        <h2 class="pixel-font" style="font-size:20px; margin:0;">Bank Centralny</h2>
+                        <p style="margin:5px 0 0; color:#888; font-size:12px;">Baza użytkowników i salda</p>
+                    </div>
+                    <div class="controls-group">
+                        <input type="text" id="bank-search" placeholder="Szukaj (login/id)..." style="width: 200px;"
+                            onkeyup="filterBank()">
+                        <button class="btn" onclick="openModal('bank')">➕ Klient</button>
+                        <button class="btn-icon" onclick="loadFile('bank')" title="Wczytaj">📥</button>
+                    </div>
+                </div>
+
+                <div class="split-view">
+                    <div class="table-wrapper">
+                        <table id="table-bank">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortData('bank', 'id')">ID ↕</th>
+                                    <th onclick="sortData('bank', 'login')">Login ↕</th>
+                                    <th onclick="sortData('bank', 'saldo')">Saldo ($) ↕</th>
+                                    <th style="width: 100px;">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="json-panel">
+                        <label>Eksport JSON</label>
+                        <textarea id="json-bank" class="code-editor" readonly></textarea>
+                        <button class="btn" style="width:100%; margin-top:auto;"
+                            onclick="copyToClipboard('json-bank')">📋 Kopiuj Kod</button>
+                        <button class="btn btn-secondary" style="width:100%; margin-top:10px;"
+                            onclick="downloadJSON('bank')">💾 Pobierz Plik</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RESTAURANT VIEW -->
+            <section id="view-restaurant" class="view-section">
+                <div class="action-header">
+                    <div>
+                        <h2 class="pixel-font" style="font-size:20px; margin:0;">Restauracja</h2>
+                        <p style="margin:5px 0 0; color:#888; font-size:12px;">System obsługi zamówień</p>
+                    </div>
+                    <div class="controls-group">
+                        <select id="restaurant-filter" onchange="renderRestaurant()" style="width: 150px;">
+                            <option value="all">Wszystkie</option>
+                            <option value="oczekuje">Oczekujące</option>
+                            <option value="w przygotowaniu">W trakcie</option>
+                            <option value="gotowe">Gotowe</option>
+                        </select>
+                        <button class="btn" onclick="openModal('restaurant')">➕ Zamówienie</button>
+                        <button class="btn-icon" onclick="loadFile('restaurant')" title="Wczytaj">📥</button>
+                    </div>
+                </div>
+
+                <div class="split-view">
+                    <div class="table-wrapper">
+                        <table id="table-restaurant">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortData('restaurant', 'number')">Nr Zamówienia ↕</th>
+                                    <th onclick="sortData('restaurant', 'status')">Status ↕</th>
+                                    <th style="width: 100px;">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="json-panel">
+                        <label>Eksport JSON</label>
+                        <textarea id="json-restaurant" class="code-editor" readonly></textarea>
+                        <button class="btn" style="width:100%; margin-top:auto;"
+                            onclick="copyToClipboard('json-restaurant')">📋 Kopiuj Kod</button>
+                        <button class="btn btn-secondary" style="width:100%; margin-top:10px;"
+                            onclick="downloadJSON('restaurant')">💾 Pobierz Plik</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONFIG VIEW -->
+            <section id="view-config" class="view-section">
+                <h2 class="pixel-font" style="margin-bottom:30px;">Konfiguracja Globalna</h2>
+                <div class="split-view">
+                    <div
+                        style="padding: 30px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
+                        <div class="form-group">
+                            <label>Wiadomość Dnia (MOTD)</label>
+                            <input type="text" id="conf-motd" placeholder="Wpisz tekst wyświetlany na górze strony...">
+                        </div>
+                        <div class="form-group">
+                            <label>Adres IP Serwera</label>
+                            <input type="text" id="conf-ip" placeholder="np. play.wiktowice.pl">
+                        </div>
+                        <div class="form-group">
+                            <label>Globalny Alert</label>
+                            <input type="text" id="conf-alert" placeholder="Czerwony pasek ostrzegawczy...">
+                        </div>
+                        <div class="form-group">
+                            <label>Tryb Konserwacji</label>
+                            <select id="conf-maint">
+                                <option value="false">🔴 Wyłączony (Strona działa)</option>
+                                <option value="true">🟢 Włączony (Blokada dostępu)</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-top: 30px; display: flex; gap: 15px;">
+                            <button class="btn" onclick="saveConfig()">💾 Zapisz Zmiany</button>
+                            <button class="btn btn-secondary" onclick="loadFile('config')">↩️ Cofnij</button>
+                        </div>
+                    </div>
+                    <div class="json-panel">
+                        <label>Eksport JSON</label>
+                        <textarea id="json-config" class="code-editor" readonly></textarea>
+                        <button class="btn" style="width:100%; margin-top:auto;"
+                            onclick="copyToClipboard('json-config')">📋 Kopiuj Kod</button>
+                        <button class="btn btn-secondary" style="width:100%; margin-top:10px;"
+                            onclick="downloadJSON('config')">💾 Pobierz Plik</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- GENERIC MODAL -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title" class="pixel-font" style="margin:0; font-size: 14px; color: var(--primary);">Edycja
+                </h3>
+                <button style="background:none; border:none; color:#888; cursor:pointer; font-size:20px;"
+                    onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
+                <button class="btn" id="modal-save-btn">Zapisz</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase_config.js"></script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

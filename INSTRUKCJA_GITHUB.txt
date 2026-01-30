@@ -1,0 +1,30 @@
+
+INSTRUKCJA WDRAŻANIA NA GITHUB PAGES
+====================================
+
+Twoja strona jest już w pełni skonfigurowana do działania na GitHub Pages!
+
+Ponieważ GitHub Pages to hosting statyczny (nie ma backendu), strona działa w trybie hybrydowym:
+
+1. SYSTEM BANKOWY (Konta, Salda)
+   - Działa w pełni AUTOMATYCZNIE.
+   - Dane są zapisywane w chmurze (Supabase).
+   - Nie musisz nic ręcznie aktualizować po rejestracji graczy.
+
+2. KONFIGURACJA I NEWSY (Admin Panel)
+   - Ponieważ GitHub nie pozwala stronom edytować samych siebie, edycja Newsów/Configu działa lokalnie w przeglądarce.
+   - Aby opublikować newsa na stałe:
+     1. Edytuj go w Panelu Admina na stronie.
+     2. Kliknij "Pobierz JSON" (przycisk przy sekcji News).
+     3. Wgraj pobrany plik do swojego repozytorium na GitHubie (nadpisz stary plik).
+
+CO ZROBIĆ TERAZ?
+----------------
+Wgraj zawartość folderu "neocities-rajman03" do swojego repozytorium o nazwie:
+wiktowice.github.io
+
+Gdy to zrobisz, strona będzie dostępna pod adresem:
+https://wiktowice.github.io/
+
+Wszystkie skrypty są już gotowe i wykryją, że działają na GitHubie.
+Powodzenia!

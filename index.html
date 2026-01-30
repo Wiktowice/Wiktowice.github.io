@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiktowice - Miasto na Modach</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#4b6920">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Meta -->
+    <meta name="description" content="Oficjalna strona serwera Minecraft Wiktowice. Dołącz do nas!">
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html">
+            <img src="logo.png" alt="Wiktowice Logo" class="logo">
+        </a>
+        <nav>
+            <a href="index.html" class="mc-btn">Start</a>
+            <a href="#about" class="mc-btn">Serwer</a>
+            <a href="https://rajman03.neocities.org/bank" class="mc-btn gold">Bank</a>
+            <a href="https://rajman03.neocities.org/ogolna_restauracja/zamowienia" class="mc-btn">Restauracja</a>
+            <a href="https://wiktowice.github.io/radio" class="mc-btn purple">Radio</a>
+            <a href="https://dc.gg/Wiktowice" target="_blank" class="mc-btn" style="background:#5865F2;">Discord</a>
+            <a href="admin.html" class="mc-btn red">ADMIN</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-title-box">
+            <h1>WIKTOWICE</h1>
+            <p style="color:#aaa; margin-top:10px; font-size:12px;">MIASTO NIEOGRANICZONYCH MOŻLIWOŚCI</p>
+        </div>
+    </div>
+
+    <main>
+
+        <section id="about">
+            <div class="mc-panel">
+                <div style="text-align:center;">
+                    <h2 class="section-title"><span>STATUS SERWERA</span></h2>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <p style="color:#ddd; font-size:12px; line-height:1.8;">
+                            Wiktowice to unikalny projekt techniczno-ekonomiczny.
+                            Budujemy, handlujemy i tworzymy zaawansowane systemy na modach.
+                            Każdy gracz tworzy własną historię.
+                        </p>
+
+                        <div class="ip-box"
+                            onclick="navigator.clipboard.writeText('wiktowice.falixsrv.me'); alert('IP skopiowane!');">
+                            IP: wiktowice.falixsrv.me
+                        </div>
+
+                        <div style="display:flex; gap:10px; justify-content:center;">
+                            <a href="https://falixnodes.net/startserver?ip=wiktowice.falixsrv.me" target="_blank"
+                                class="mc-btn green">
+                                ▶ START SERWERA
+                            </a>
+                            <a href="https://tinyurl.com/WiktowiceMody" target="_blank" class="mc-btn">
+                                📦 POBIERZ MODY
+                            </a>
+                        </div>
+                    </div>
+                    <div
+                        style="background:#000; border:2px solid #555; display:flex; align-items:center; justify-content:center;">
+                        <!-- Placeholder for dynmap or status image -->
+                        <div style="text-align:center;">
+                            <span style="font-size:40px;">🗺️</span><br>
+                            <span style="font-size:10px; color:#666;">PODGLĄD MAPY</span><br>
+                            <a href="#" class="mc-btn" style="font-size:10px; margin-top:10px;">OTWÓRZ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="news">
+            <div style="text-align:center;">
+                <h2 class="section-title"><span>AKTUALNOŚCI</span></h2>
+            </div>
+
+            <div id="news-container">
+                <!-- News loaded dynamically -->
+                <div style="text-align:center; padding:40px;">
+                    <p>Ładowanie wiadomości z serwera...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div style="margin-bottom:20px;">
+            <img src="logo.png" style="height:40px; opacity:0.5;">
+        </div>
+        <p>&copy; 2025 Rząd Wiktowic. Wszelkie prawa zastrzeżone.</p>
+        <p style="color:#444; margin-top:10px;">Not affiliated with Mojang Studios.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
