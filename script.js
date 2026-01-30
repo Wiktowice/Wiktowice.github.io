@@ -47,12 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(config => {
             // Maintenance Check
             if (config.maintenance) {
-                document.body.innerHTML = `
-                    <div style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;text-align:center;background:#111;color:#fff;font-family:sans-serif;">
-                        <h1>PRZERWA TECHNICZNA</h1>
-                        <p>${config.alertMessage || "Strona jest aktualnie niedostępna."}</p>
-                    </div>
-                `;
+                showErrorScreen(
+                    "błąd krytyczny",
+                    "PRZERWA TECHNICZNA",
+                    config.alertMessage || "Trwają prace konserwacyjne. Serwery są aktualnie wyłączone. Wróć później."
+                );
                 return;
             }
 
@@ -85,7 +84,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     .catch(() => console.warn("Nie udało się pobrać statusu serwera MC."));
             }
         })
-        .catch(e => console.log("Config ignored or missing"));
+        .catch(e => {
+            console.error("Critical Config Error:", e);
+            // Critical Error Screen
+            showErrorScreen(
+                "BŁĄD KRYTYCZNY",
+                "SYSTEM FAILURE",
+                "Nie udało się załadować konfiguracji systemu.<br>Sprawdź połączenie lub skontaktuj się z administratorem."
+            );
+        });
+
+    function showErrorScreen(title, subtitle, message) {
+        // Ensure fonts are loaded
+        const fontLink = document.createElement('link');
+        fontLink.href = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;700&display=swap';
+        fontLink.rel = 'stylesheet';
+        document.head.appendChild(fontLink);
+
+        document.body.innerHTML = `
+            <style>
+                body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; background: #000 url('tlo.png') no-repeat center center fixed; background-size: cover; color: #fff; font-family: 'Inter', sans-serif; }
+                .overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 0; }
+                .content { position: relative; z-index: 1; padding: 40px; background: rgba(18, 18, 18, 0.9); border: 2px solid #333; border-radius: 16px; box-shadow: 0 0 50px rgba(0, 0, 0, 0.8); max-width: 600px; width: 90%; animation: fadeIn 0.5s ease-out; }
+                h1 { font-family: 'Press Start 2P', cursive; font-size: 32px; color: #ef4444; margin: 0 0 20px 0; text-shadow: 4px 4px 0px #000; line-height: 1.4; }
+                h2 { font-family: 'Press Start 2P', cursive; font-size: 14px; color: #d4a017; margin-bottom: 30px; line-height: 1.5; }
+                p { color: #aaa; font-size: 16px; margin-bottom: 40px; line-height: 1.6; }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+            </style>
+            <div class="overlay"></div>
+            <div class="content">
+                <h1>${title}</h1>
+                <h2>${subtitle}</h2>
+                <p>${message}</p>
+            </div>
+        `;
+    }
 
     // --- Newsy ---
     sprawdzNoweNews(ROOT);

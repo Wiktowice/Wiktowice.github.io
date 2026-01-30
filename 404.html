@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Nie znaleziono strony | Wiktowice</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;700&display=swap">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            background: #000 url('tlo.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+            background: rgba(18, 18, 18, 0.9);
+            border: 2px solid #333;
+            border-radius: 16px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            max-width: 600px;
+            width: 90%;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 64px;
+            color: #ef4444;
+            /* Red for Error */
+            margin: 0 0 20px 0;
+            text-shadow: 4px 4px 0px #000;
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+            color: #d4a017;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        p {
+            color: #aaa;
+            font-size: 16px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #d4a017;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .btn:hover {
+            background: #b8860b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 160, 23, 0.3);
+        }
+
+        .glitch {
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div class="content">
+        <h1 class="glitch">404</h1>
+        <h2>ZGUBIŁEŚ SIĘ W GRZE?</h2>
+        <p>
+            Wygląda na to, że strona, której szukasz, została usunięta,
+            przeniesiona lub nigdy nie istniała.<br>
+            Wróć do bezpiecznej strefy.
+        </p>
+        <a href="index.html" class="btn">WRÓĆ NA STRONĘ GŁÓWNĄ</a>
+    </div>
+
+    <!-- Script so it works with SPA router if needed later, but standard 404 for now -->
+</body>
+
+</html>
