@@ -1,5 +1,5 @@
 /* --- CONFIG & STATE --- */
-const DEFAULT_ADMIN_PASSWORD_HASH = "87ef82428c924c6415451b3e9295bfdabc149e3fc552a5af35565865a2f";
+
 const FILES = {
     news: '739_news_secure.json',
     bank: 'bank_users', // Using table name logic for Supabase
@@ -60,8 +60,7 @@ async function getAdminPasswordHash() {
             console.warn("Błąd pobierania hasła z Supabase (może brak tabeli system_config?):", error.message);
         }
     }
-    console.warn("Używam domyślnego hasła (hardcoded).");
-    return DEFAULT_ADMIN_PASSWORD_HASH;
+    return null;
 }
 
 async function attemptLogin() {
@@ -70,6 +69,12 @@ async function attemptLogin() {
     const correctHash = await getAdminPasswordHash();
 
     // console.log('Login attempt initiated'); // Debug log removed for security
+
+    if (!correctHash) {
+        showToast('Błąd krytyczny: Nie można pobrać hasła z Supabase. Sprawdź konfigurację.', 'error');
+        console.error("Failed to retrieve admin hash from DB.");
+        return;
+    }
 
     if (hash === correctHash) {
         document.getElementById('login-screen').style.opacity = '0';
