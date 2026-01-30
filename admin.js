@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* --- AUTH --- */
 function attemptLogin() {
-    const pass = document.getElementById('login-pass').value;
+    const pass = document.getElementById('login-pass').value.trim();
 
     if (pass === ADMIN_PASSWORD) {
         document.getElementById('login-screen').style.opacity = '0';
