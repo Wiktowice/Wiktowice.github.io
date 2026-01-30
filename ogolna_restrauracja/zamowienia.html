@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pl">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Tablica Zamówień — Restauracja</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-eval';">
+</head>
+
+<body>
+    <div class="wrap">
+        <div style="margin-bottom: 20px;">
+            <a href="https://rajman03.neocities.org"
+                style="color: #fff; text-decoration: none; border-bottom: 1px dashed #fff;">&larr; Strona Główna</a>
+        </div>
+        <h1>Tablica Zamówień</h1>
+        <ul id="orders">
+            <!-- Content loaded via JS -->
+            <li class="empty-state">Ładowanie zamówień...</li>
+        </ul>
+    </div>
+    <script>
+        async function loadOrders() {
+            try {
+                const res = await fetch('992_orders_secure.json?cache=' + Date.now());
+                const data = await res.json();
+                const list = document.getElementById('orders');
+
+                list.innerHTML = '';
+
+                if (!Array.isArray(data) || !data.length) {
+                    list.innerHTML = '<li class="empty-state">Brak aktywnych zamówień</li>';
+                    return;
+                }
+
+                data.forEach(o => {
+                    const li = document.createElement('li');
+                    // Safe HTML insertion
+                    const numSpan = document.createElement('span');
+                    numSpan.className = 'num';
+                    numSpan.textContent = o.number;
+
+                    const statusSpan = document.createElement('span');
+                    statusSpan.className = 'status';
+                    statusSpan.textContent = o.status;
+
+                    li.appendChild(numSpan);
+                    li.appendChild(statusSpan);
+                    list.appendChild(li);
+                });
+            } catch (e) {
+                console.error(e);
+                const list = document.getElementById('orders');
+                if (list) list.innerHTML = '<li class="empty-state" style="color:#ff5555">Błąd połączenia</li>';
+            }
+        }
+        loadOrders();
+        setInterval(loadOrders, 15000);
+    </script>
+</body>
+
+</html>
