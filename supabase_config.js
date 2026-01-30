@@ -18,6 +18,7 @@ if (typeof supabase !== 'undefined') {
         console.warn("⚠️ SUPABASE NIESKONFIGUROWANE! Uzupełnij plik supabase_config.js");
     } else {
         _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        window._supabase = _supabase; // Ensure global access
         console.log("✅ Połączono z Supabase");
     }
 } else {

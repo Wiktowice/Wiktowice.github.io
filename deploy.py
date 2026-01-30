@@ -90,7 +90,7 @@ def upload_files(api_key):
             print(f"   ❌ Wyjątek: {e}")
 
     print(f"\n✨ Zakończono! Wgrano {total_uploaded} plików.")
-    print("🌍 Twoja strona powinna być zaktualizowana na: https://rajman03.neocities.org/")
+    print("🌍 Twoja strona powinna być zaktualizowana na: https://wiktowice.github.io/")
 
 if __name__ == "__main__":
     key = get_api_key()

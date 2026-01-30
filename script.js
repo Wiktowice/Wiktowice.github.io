@@ -151,14 +151,46 @@ function sprawdzNoweNews(rootPath = '') {
 }
 
 function loadNewsContainer(rootPath = '') {
+    // 1. Try Supabase
+    if (typeof _supabase !== 'undefined' && _supabase) {
+        _supabase.from('news').select('*').order('id', { ascending: false })
+            .then(({ data, error }) => {
+                const container = document.getElementById('news-container');
+                if (!container) return;
+
+                if (error || !data) {
+                    console.warn("Supabase news fetch failed, trying JSON fallback...", error);
+                    loadNewsFromJson(rootPath);
+                    return;
+                }
+
+                container.innerHTML = '';
+                if (data.length === 0) {
+                    container.innerHTML = '<p>Brak aktualności.</p>';
+                }
+
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'news-item';
+                    div.innerHTML = `<strong>${escapeHtml(item.title)}</strong> <em>(${escapeHtml(item.date)})</em><p>${escapeHtml(item.content)}</p>`;
+                    container.appendChild(div);
+                });
+            });
+        return;
+    }
+
+    // 2. Fallback
+    loadNewsFromJson(rootPath);
+}
+
+function loadNewsFromJson(rootPath) {
     fetch(rootPath + '739_news_secure.json')
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('news-container');
-            if (!container) return; // Silent return if container missing (e.g. not on homepage)
+            if (!container) return;
 
             container.innerHTML = '';
-
             const reversedData = [...data].reverse();
 
             reversedData.forEach(item => {
@@ -170,7 +202,7 @@ function loadNewsContainer(rootPath = '') {
         })
         .catch(err => {
             const container = document.getElementById('news-container');
-            if (container) container.innerHTML = '<p>Brak aktualności lub błąd ładowania JSON.</p>';
+            if (container) container.innerHTML = '<p>Brak aktualności lub błąd ładowania.</p>';
             console.error('Error loading news container:', err);
         });
 }

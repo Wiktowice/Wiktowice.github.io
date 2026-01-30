@@ -18,6 +18,8 @@
 
     <!-- Meta -->
     <meta name="description" content="Oficjalna strona serwera Minecraft Wiktowice. Dołącz do nas!">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; media-src 'self'; connect-src 'self' http://localhost:3000 https://*.supabase.co https://cdn.jsdelivr.net https://api.mcstatus.io; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;">
 </head>
 
 <body>
@@ -29,9 +31,9 @@
         <nav>
             <a href="index.html" class="mc-btn">Start</a>
             <a href="#about" class="mc-btn">Serwer</a>
-            <a href="https://wiktowice.github.io/bank" class="mc-btn gold">Bank</a>
-            <a href="https://wiktowice.github.io/ogolna_restauracja/zamowienia" class="mc-btn">Restauracja</a>
-            <a href="https://atmrrgrupa.github.io" class="mc-btn purple">ATM Rozrywka: REWORK</a>
+            <a href="bank/index.html" class="mc-btn gold">Bank</a>
+            <a href="ogolna_restauracja/zamowienia.html" class="mc-btn">Restauracja</a>
+            <a href="https://atmrrgrupa.github.io/" class="mc-btn purple">ATM ROZRYWKA: REWORK</a>
             <a href="https://dc.gg/Wiktowice" target="_blank" class="mc-btn" style="background:#5865F2;">Discord</a>
             <a href="admin.html" class="mc-btn red">ADMIN</a>
         </nav>
@@ -71,7 +73,8 @@
                                 class="mc-btn green">
                                 ▶ START SERWERA
                             </a>
-                            <a href="https://tinyurl.com/WiktowiceMody" target="_blank" class="mc-btn">
+                            <a href="https://drive.google.com/drive/folders/16m97C5u567kNuH32Lhng1Q9ZKLnYh3Ga?usp=drive_link"
+                                target="_blank" class="mc-btn">
                                 📦 POBIERZ MODY
                             </a>
                         </div>
@@ -112,8 +115,10 @@
         <p style="color:#444; margin-top:10px;">Not affiliated with Mojang Studios.</p>
     </footer>
 
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase_config.js"></script>
     <script src="script.js"></script>
 </body>
-
 
 </html>

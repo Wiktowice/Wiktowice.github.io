@@ -1,6 +1,6 @@
 
 /* --- CONFIG & STATE --- */
-const PASSWORD_HASH = "5fc30dc0d520f847a3eabb9f3b47db7b596ad2df95660de1ec37a8c62a63d542";
+const PASSWORD_HASH = "2eb302b243fa520f42e6837289c3e3d42cc6380b30668735b7a77893c0397558";
 const FILES = {
     news: '739_news_secure.json',
     bank: 'bank_users', // Using table name logic for Supabase
@@ -50,7 +50,7 @@ async function attemptLogin() {
             loadAllData();
         }, 500);
     } else {
-        showToast('Access Denied: Invalid Password', 'error');
+        showToast('Odmowa dostępu: Nieprawidłowe hasło', 'error');
         document.getElementById('login-pass').value = '';
     }
 }
@@ -67,21 +67,27 @@ function loadAllData() {
 }
 
 async function loadFile(context, silent = false) {
-    if (context === 'bank' && _supabase) {
-        // Supabase Fetch
-        const { data, error } = await _supabase.from('bank_users').select('*').order('id', { ascending: true });
+    // SUPABASE SUPPORT FOR BANK, NEWS, RESTAURANT
+    if ((context === 'bank' || context === 'news' || context === 'restaurant') && typeof _supabase !== 'undefined' && _supabase) {
+
+        let tableName = 'bank_users';
+        if (context === 'news') tableName = 'news';
+        if (context === 'restaurant') tableName = 'orders';
+
+        const orderBy = context === 'bank' ? 'id' : 'id'; // Sort logic could be improved for news (e.g. date)
+
+        const { data, error } = await _supabase.from(tableName).select('*').order(orderBy, { ascending: true });
 
         if (error) {
             console.error('Supabase Error:', error);
-            if (error.code === 'PGRST204' || error.code === '404' || error.message.includes('relation "public.bank_users" does not exist')) {
-                alert("⚠️ BŁĄD KRYTYCZNY SUPABASE:\n\nBrakuje tabeli 'bank_users'.\nWejdź w SQL Editor w Supabase i wklej kod podany przez AI!");
+            if (error.code === 'PGRST204' || error.code === '404' || error.message.includes(`relation "public.${tableName}" does not exist`)) {
+                alert(`⚠️ BŁĄD KRYTYCZNY SUPABASE:\n\nBrakuje tabeli '${tableName}'.\nWejdź w SQL Editor w Supabase i wklej kod podany przez AI!`);
             }
-            if (!silent) showToast('Błąd bazy danych: ' + error.message, 'error');
-            // Fallback to local array
+            if (!silent) showToast(`Błąd bazy danych (${context}): ` + error.message, 'error');
             db[context] = [];
         } else {
-            db[context] = data;
-            if (!silent) showToast('Pobrano dane z Supabase (Bank)', 'success');
+            db[context] = data || [];
+            if (!silent) showToast(`Pobrano dane z Supabase (${context})`, 'success');
         }
     } else {
         // Normal JSON Fetch
@@ -115,6 +121,44 @@ function refreshView(context) {
         document.getElementById('conf-alert').value = c.alertMessage || '';
         updateJsonPreview('config');
     }
+    updateJsonPreview(context);
+}
+
+async function deleteItem(context, idOrIndex) {
+    if (!confirm('Czy na pewno usunąć ten element? Operacja jest nieodwracalna.')) return;
+
+    // SUPABASE DELETE
+    if ((context === 'bank' || context === 'news' || context === 'restaurant') && typeof _supabase !== 'undefined' && _supabase) {
+        let idToDelete = null;
+        if (context === 'bank') {
+            idToDelete = idOrIndex;
+        } else if (context === 'news' || context === 'restaurant') {
+            // Get ID from object at index
+            const item = db[context][idOrIndex];
+            if (item && item.id) idToDelete = item.id;
+        }
+
+        if (idToDelete) {
+            let tableName = 'bank_users';
+            if (context === 'news') tableName = 'news';
+            if (context === 'restaurant') tableName = 'orders';
+
+            const { error } = await _supabase.from(tableName).delete().eq('id', idToDelete);
+
+            if (error) {
+                showToast('Błąd usuwania z Supabase: ' + error.message, 'error');
+                return;
+            }
+        }
+    }
+    // If not Supabase or Supabase delete successful, proceed with local data update
+    if (context === 'bank') {
+        db.bank = db.bank.filter(item => item.id !== idOrIndex);
+    } else {
+        db[context].splice(idOrIndex, 1);
+    }
+    showToast('Element usunięty pomyślnie!', 'success');
+    refreshView(context);
     updateJsonPreview(context);
 }
 
@@ -374,47 +418,68 @@ document.getElementById('modal-save-btn').addEventListener('click', () => {
 async function deleteItem(context, idOrIndex) {
     if (!confirm('Czy na pewno usunąć ten element? Operacja jest nieodwracalna.')) return;
 
-    if (context === 'bank') {
-        // ID based
-        const idToDelete = idOrIndex; // In bank context, idOrIndex IS the ID
-
-        if (typeof _supabase !== 'undefined' && _supabase) { // Check if _supabase is defined and not null/undefined
-            const { error } = await _supabase.from('bank_users').delete().eq('id', idToDelete);
-            if (error) {
-                showToast('Błąd usuwania z Supabase: ' + error.message, 'error');
-                return;
-            }
+    // SUPABASE DELETE
+    if ((context === 'bank' || context === 'news') && typeof _supabase !== 'undefined' && _supabase) {
+        let idToDelete = null;
+        if (context === 'bank') {
+            idToDelete = idOrIndex; // Passed as ID for bank
+        } else if (context === 'news') {
+            // For news, idOrIndex is the array index. We need to get the item's ID.
+            const n = db.news[idOrIndex];
+            if (n && n.id) idToDelete = n.id;
         }
 
-        db.bank = db.bank.filter(u => u.id !== idToDelete);
+        if (idToDelete) {
+            const tableName = context === 'bank' ? 'bank_users' : 'news';
+            const { error } = await _supabase.from(tableName).delete().eq('id', idToDelete);
+
+            if (error) {
+                showToast('Błąd usuwania z Supabase: ' + error.message, 'error');
+                return; // Stop if Supabase deletion failed
+            }
+        }
+    }
+
+    // LOCAL ARRAY DELETE
+    if (context === 'bank') {
+        db.bank = db.bank.filter(u => u.id !== idOrIndex);
     } else {
-        // Index based
         db[context].splice(idOrIndex, 1);
     }
 
-    saveToLocal(context); // Zapisz na dysku (lub zignoruj jeśli Supabase obsłużył)
+    saveToLocal(context);
     refreshView(context);
     updateDashboard();
     showToast('Element usunięty.', 'success');
 }
 
 async function saveToLocal(context) {
-    // 1. ZAWSZE zapisz w LocalStorage (Działa wszędzie: Netlify, Vercel, Localhost...)
+    // 1. LocalStorage
     localStorage.setItem('admin_db_' + context, JSON.stringify(db[context]));
     updateJsonPreview(context);
     updateDashboard();
 
-    // 2. Obsługa Supabase (Tylko dla Banku - działa wszędzie)
-    if (context === 'bank' && typeof _supabase !== 'undefined' && _supabase) {
+    // 2. Supabase (Bank, News, Restaurant)
+    if ((context === 'bank' || context === 'news' || context === 'restaurant') && typeof _supabase !== 'undefined' && _supabase) {
         showToast('⏳ Wysyłanie do Supabase...', 'info');
-        const { error } = await _supabase.from('bank_users').upsert(db.bank);
+
+        // Context to Table Mapping
+        let tableName = 'bank_users';
+        if (context === 'news') tableName = 'news';
+        if (context === 'restaurant') tableName = 'orders';
+
+        const { data, error } = await _supabase.from(tableName).upsert(db[context]).select();
+
         if (error) {
             console.error(error);
             showToast('⚠️ Błąd chmury: ' + error.message, 'error');
         } else {
             showToast('✅ Zsynchronizowano z chmurą (Supabase)', 'success');
+            // Update local DB with returned data (useful for getting new IDs)
+            if (data) db[context] = data;
+            refreshView(context);
         }
-        return; // Supabase ma priorytet
+        return;
     }
 
     // 3. Sprawdź środowisko i spróbuj zapisać trwale
@@ -437,11 +502,11 @@ async function saveToLocal(context) {
 
     } else if (window.location.hostname.includes('github.io')) {
         // --- GITHUB PAGES ---
-        showToast('ℹ️ GitHub Pages: Zapisano w przeglądarce. (Baza danych Banku zapisana w chmurze!)', 'success');
+        showToast('ℹ️ GitHub Pages: Zapisano w przeglądarce.', 'success');
 
     } else {
         // --- INNY HOSTING ---
-        showToast('✅ Zapisano w przeglądarce. (Aby wgrać na serwer: Pobierz JSON)', 'success');
+        showToast('✅ Zapisano w przeglądarce.', 'success');
     }
 }
 
@@ -511,4 +576,9 @@ function showToast(msg, type = 'success') {
         box.style.transform = 'translateY(100%)';
         setTimeout(() => box.remove(), 300);
     }, 3000);
+}
+
+function navTo(viewName) {
+    const item = document.querySelector(`.nav-item[data-view="${viewName}"]`);
+    if (item) item.click();
 }
