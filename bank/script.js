@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleView('account');
             document.getElementById("user-name").textContent = user.login;
             document.getElementById("user-id").textContent = user.id;
-            document.getElementById("user-saldo").textContent = "$" + user.saldo;
+            document.getElementById("user-saldo").textContent = user.saldo;
 
             // Format saldo color
             const saldoEl = document.getElementById("user-saldo");
