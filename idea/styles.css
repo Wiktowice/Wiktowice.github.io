@@ -1,0 +1,187 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  /* 90s Corporate Palette - Refined */
+  --bg: #e6e6e6;
+  /* Classic Windows Grey */
+  --header-bg: #000080;
+  /* Windows Title Bar Blue */
+  --header-text: #ffffff;
+  --card-bg: #ffffff;
+  --text: #000000;
+  --muted: #555555;
+  --accent-yellow: #ffff00;
+  --accent-red: #ff0000;
+
+  /* 3D Borders */
+  --border-light: #ffffff;
+  --border-shadow: #808080;
+  --border-dark: #404040;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Verdana", "Arial", sans-serif;
+  background: #008080;
+  /* Classic Teal Desktop */
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Retro Window Container */
+body {
+  padding: 10px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: var(--header-bg);
+  color: var(--header-text);
+  border: 2px solid;
+  border-color: var(--border-light) var(--border-shadow) var(--border-shadow) var(--border-light);
+  margin-bottom: 10px;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.nav-actions {
+  margin-left: auto;
+}
+
+/* Retro Button Link */
+.home-link {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #c0c0c0;
+  color: #000;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: bold;
+  border: 2px solid;
+  border-color: var(--border-light) var(--border-shadow) var(--border-shadow) var(--border-light);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.home-link:active {
+  border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+/* Content Area */
+.content {
+  flex: 1;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: var(--border-light) var(--border-shadow) var(--border-shadow) var(--border-light);
+  padding: 15px;
+  box-shadow: 4px 4px 0 #000;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Cards / Section Headers */
+.card {
+  background: #fff;
+  border: 2px solid;
+  border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
+  /* Inset look */
+  padding: 15px;
+}
+
+.card h1 {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 24px;
+  margin: 0 0 10px;
+  color: #000;
+  font-weight: bold;
+}
+
+.card h2 {
+  font-size: 16px;
+  color: #d32f2f;
+  margin: 0 0 10px;
+  border-bottom: 1px dashed #999;
+  padding-bottom: 4px;
+}
+
+.card h3 {
+  font-size: 14px;
+  color: #000080;
+  margin: 0 0 5px;
+}
+
+.lead {
+  font-size: 12px;
+  color: #333;
+}
+
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-list li {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #ccc;
+  padding-bottom: 2px;
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.grid>div {
+  background: #fff;
+  padding: 10px;
+  border: 1px solid #000;
+  box-shadow: 2px 2px 0 #888;
+}
+
+@media (max-width: 400px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-bar {
+    flex-wrap: wrap;
+  }
+}
