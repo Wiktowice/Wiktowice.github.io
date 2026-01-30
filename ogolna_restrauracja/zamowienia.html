@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="style.css">
     <!-- CSP -->
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-eval';">
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:3000 https://*.supabase.co https://cdn.jsdelivr.net https://api.mcstatus.io; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;">
 </head>
 
 <body>
     <div class="wrap">
         <div style="margin-bottom: 20px;">
-            <a href="https://wiktowice.github.io"
-                style="color: #fff; text-decoration: none; border-bottom: 1px dashed #fff;">&larr; Strona Główna</a>
+            <a href="../index.html" style="color: #fff; text-decoration: none; border-bottom: 1px dashed #fff;">&larr;
+                Strona Główna</a>
         </div>
         <h1>Tablica Zamówień</h1>
         <ul id="orders">
@@ -23,23 +23,58 @@
             <li class="empty-state">Ładowanie zamówień...</li>
         </ul>
     </div>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabase_config.js"></script>
     <script>
+        // Supabase Initialization Check
+        // _supabase should be available from supabase_config.js
+
         async function loadOrders() {
             try {
-                const res = await fetch('992_orders_secure.json?cache=' + Date.now());
-                const data = await res.json();
-                const list = document.getElementById('orders');
+                let data = [];
 
+                // 1. Try Supabase
+                if (typeof _supabase !== 'undefined' && _supabase) {
+                    const { data: sbData, error } = await _supabase
+                        .from('orders')
+                        .select('*')
+                        .neq('status', 'wydane'); // Hide completed orders from public board? Or show all?
+                    // Let's show all for now or filter. User didn't specify, but usually 'wydane' might be hidden or shown.
+                    // Let's match previous logic: json file had all.
+
+                    if (!error && sbData) {
+                        data = sbData;
+                    } else {
+                        console.warn("Supabase fetch error:", error);
+                        // Fallback to JSON if Supabase fails
+                        const res = await fetch('992_orders_secure.json?cache=' + Date.now());
+                        data = await res.json();
+                    }
+                } else {
+                    // 2. Local Fallback
+                    const res = await fetch('992_orders_secure.json?cache=' + Date.now());
+                    data = await res.json();
+                }
+
+                const list = document.getElementById('orders');
                 list.innerHTML = '';
+
+                // Filter out 'wydane' if desired, or show all. 
+                // Let's show active orders only on the board to keep it clean, or all.
+                // Replicating original file logic: it just showed all in JSON.
+                // However, usually boards show pending/ready.
 
                 if (!Array.isArray(data) || !data.length) {
                     list.innerHTML = '<li class="empty-state">Brak aktywnych zamówień</li>';
                     return;
                 }
 
+                // Optional: Sort by ID or Number?
+                // data.sort((a,b) => b.id - a.id);
+
                 data.forEach(o => {
                     const li = document.createElement('li');
-                    // Safe HTML insertion
                     const numSpan = document.createElement('span');
                     numSpan.className = 'num';
                     numSpan.textContent = o.number;
@@ -47,6 +82,10 @@
                     const statusSpan = document.createElement('span');
                     statusSpan.className = 'status';
                     statusSpan.textContent = o.status;
+
+                    // Simple color coding based on text
+                    if (o.status === 'gotowe') statusSpan.style.color = '#55ff55';
+                    if (o.status === 'w przygotowaniu') statusSpan.style.color = '#ffff55';
 
                     li.appendChild(numSpan);
                     li.appendChild(statusSpan);
