@@ -185,7 +185,8 @@ async function deleteItem(context, idOrIndex) {
 }
 
 function updateJsonPreview(context) {
-    document.getElementById(`json-${context}`).value = JSON.stringify(db[context], null, 4);
+    const el = document.getElementById(`json-${context}`);
+    if (el) el.value = JSON.stringify(db[context], null, 4);
 }
 
 /* --- SORTING --- */
