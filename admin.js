@@ -37,46 +37,41 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* --- AUTH --- */
-async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
-async function getAdminPasswordHash() {
+
+async function getAdminPassword() {
     if (typeof _supabase !== 'undefined' && _supabase) {
         const { data, error } = await _supabase
             .from('system_config')
             .select('value')
-            .eq('key', 'admin_password_hash')
+            .eq('key', 'admin_password')
             .single();
 
         if (data && data.value) {
-            console.log("Pobrano hasło z Supabase");
+
             return data.value;
         }
         if (error) {
-            console.warn("Błąd pobierania hasła z Supabase (może brak tabeli system_config?):", error.message);
+            console.warn("Błąd pobierania hasła z Supabase:", error.message);
         }
     }
     return null;
 }
 
+
 async function attemptLogin() {
     const pass = document.getElementById('login-pass').value.trim();
-    const hash = await sha256(pass);
-    const correctHash = await getAdminPasswordHash();
+    const correctPass = await getAdminPassword();
 
-    // console.log('Login attempt initiated'); // Debug log removed for security
+    // console.log('Login attempt initiated');
 
-    if (!correctHash) {
-        showToast('Błąd krytyczny: Nie można pobrać hasła z Supabase. Sprawdź konfigurację.', 'error');
-        console.error("Failed to retrieve admin hash from DB.");
+    if (!correctPass) {
+        showToast('Błąd krytyczny: Nie można pobrać hasła z Supabase. Sprawdź tabelę system_config (klucz: admin_password).', 'error');
+        console.error("Failed to retrieve admin password from DB.");
         return;
     }
 
-    if (hash === correctHash) {
+    if (pass === correctPass) {
         document.getElementById('login-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
