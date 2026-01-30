@@ -89,39 +89,67 @@ function loadAllData() {
 }
 
 async function loadFile(context, silent = false) {
-    // SUPABASE SUPPORT FOR BANK, NEWS, RESTAURANT
-    if ((context === 'bank' || context === 'news' || context === 'restaurant') && typeof _supabase !== 'undefined' && _supabase) {
+    // SUPABASE SUPPORT
+    if (typeof _supabase !== 'undefined' && _supabase) {
 
-        let tableName = 'bank_users';
-        if (context === 'news') tableName = 'news';
-        if (context === 'restaurant') tableName = 'orders';
+        // --- CONFIG (Special Case: Key-Value storage) ---
+        if (context === 'config') {
+            const { data, error } = await _supabase.from('system_config').select('key, value');
+            if (error) {
+                console.error("Supabase Config Load Error:", error);
+                if (!silent) showToast("Błąd pobierania konfiguracji: " + error.message, 'error');
+            } else {
+                // Convert KV array to Object
+                const configObj = {};
+                data.forEach(row => {
+                    // Try parsing boolean/json, otherwise string
+                    if (row.value === 'true') configObj[row.key] = true;
+                    else if (row.value === 'false') configObj[row.key] = false;
+                    else configObj[row.key] = row.value;
+                });
 
-        const orderBy = context === 'bank' ? 'id' : 'id'; // Sort logic could be improved for news (e.g. date)
-
-        const { data, error } = await _supabase.from(tableName).select('*').order(orderBy, { ascending: true });
-
-        if (error) {
-            console.error('Supabase Error:', error);
-            if (error.code === 'PGRST204' || error.code === '404' || error.message.includes(`relation "public.${tableName}" does not exist`)) {
-                alert(`⚠️ BŁĄD KRYTYCZNY SUPABASE:\n\nBrakuje tabeli '${tableName}'.\nWejdź w SQL Editor w Supabase i wklej kod podany przez AI!`);
+                // Map DB keys to App keys
+                db.config = {
+                    motd: configObj.motd || '',
+                    serverIp: configObj.server_ip || '',
+                    maintenance: configObj.maintenance || false,
+                    alertMessage: configObj.alert_message || ''
+                };
+                if (!silent) showToast("Pobrano konfigurację z Supabase", 'success');
             }
-            if (!silent) showToast(`Błąd bazy danych (${context}): ` + error.message, 'error');
-            db[context] = [];
-        } else {
-            db[context] = data || [];
-            if (!silent) showToast(`Pobrano dane z Supabase (${context})`, 'success');
+        }
+
+        // --- DATA TABLES (News, Bank, Restaurant) ---
+        else if (context === 'bank' || context === 'news' || context === 'restaurant') {
+            let tableName = 'bank_users';
+            if (context === 'news') tableName = 'news';
+            if (context === 'restaurant') tableName = 'orders';
+
+            const orderBy = context === 'bank' ? 'id' : 'id';
+            const { data, error } = await _supabase.from(tableName).select('*').order(orderBy, { ascending: true });
+
+            if (error) {
+                console.error('Supabase Error:', error);
+                if (error.code === 'PGRST204' || error.code === '404') {
+                    alert(`⚠️ BŁĄD KRYTYCZNY SUPABASE: Brakuje tabeli '${tableName}'`);
+                }
+                if (!silent) showToast(`Błąd bazy danych (${context}): ` + error.message, 'error');
+                db[context] = [];
+            } else {
+                db[context] = data || [];
+                if (!silent) showToast(`Pobrano dane z Supabase (${context})`, 'success');
+            }
         }
     } else {
-        // Normal JSON Fetch
+        // ... (Existing JSON Fallback) ...
         try {
             const res = await fetch(FILES[context] + '?nocache=' + Date.now());
             if (!res.ok) throw new Error("404/Error");
             const data = await res.json();
             db[context] = data || (context === 'config' ? {} : []);
-            if (!silent) showToast(`Data synced: ${context}`, 'success');
+            if (!silent) showToast(`Data synced (Local/JSON): ${context}`, 'success');
         } catch (err) {
             console.warn(err);
-            if (!silent) showToast(`Sync failed: ${context}`, 'error');
             db[context] = (context === 'config' ? {} : []);
         }
     }
@@ -482,27 +510,47 @@ async function saveToLocal(context) {
     updateJsonPreview(context);
     updateDashboard();
 
-    // 2. Supabase (Bank, News, Restaurant)
-    if ((context === 'bank' || context === 'news' || context === 'restaurant') && typeof _supabase !== 'undefined' && _supabase) {
+    // 2. Supabase
+    if (typeof _supabase !== 'undefined' && _supabase) {
         showToast('⏳ Wysyłanie do Supabase...', 'info');
 
-        // Context to Table Mapping
-        let tableName = 'bank_users';
-        if (context === 'news') tableName = 'news';
-        if (context === 'restaurant') tableName = 'orders';
+        // --- CONFIG SAVE ---
+        if (context === 'config') {
+            const updates = [
+                { key: 'motd', value: db.config.motd || '' },
+                { key: 'server_ip', value: db.config.serverIp || '' },
+                { key: 'maintenance', value: db.config.maintenance ? 'true' : 'false' },
+                { key: 'alert_message', value: db.config.alertMessage || '' }
+            ];
 
-        const { data, error } = await _supabase.from(tableName).upsert(db[context]).select();
-
-        if (error) {
-            console.error(error);
-            showToast('⚠️ Błąd chmury: ' + error.message, 'error');
-        } else {
-            showToast('✅ Zsynchronizowano z chmurą (Supabase)', 'success');
-            // Update local DB with returned data (useful for getting new IDs)
-            if (data) db[context] = data;
-            refreshView(context);
+            const { error } = await _supabase.from('system_config').upsert(updates);
+            if (error) {
+                console.error("Config Save Error:", error);
+                showToast('⚠️ Błąd zapisu konfiguracji: ' + error.message, 'error');
+            } else {
+                showToast('✅ Konfiguracja zapisana w chmurze', 'success');
+            }
+            return;
         }
-        return;
+
+        // --- OTHER DATA SAVE (News, Bank, Restaurant) ---
+        if (context === 'bank' || context === 'news' || context === 'restaurant') {
+            let tableName = 'bank_users';
+            if (context === 'news') tableName = 'news';
+            if (context === 'restaurant') tableName = 'orders';
+
+            const { data, error } = await _supabase.from(tableName).upsert(db[context]).select();
+
+            if (error) {
+                console.error("Supabase Save Error:", error);
+                showToast('⚠️ Błąd chmury: ' + error.message, 'error');
+            } else {
+                showToast('✅ Zsynchronizowano z chmurą', 'success');
+                if (data) db[context] = data;
+                refreshView(context);
+            }
+            return;
+        }
     }
 
     // 3. Sprawdź środowisko i spróbuj zapisać trwale

@@ -42,57 +42,101 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CONFIG & STATUS SERWERA ---
-    fetch(ROOT + 'site_config.json?nocache=' + Date.now())
-        .then(res => res.json())
-        .then(config => {
-            // Maintenance Check
-            if (config.maintenance) {
-                showErrorScreen(
-                    "błąd krytyczny",
-                    "PRZERWA TECHNICZNA",
-                    config.alertMessage || "Trwają prace konserwacyjne. Serwery są aktualnie wyłączone. Wróć później."
-                );
-                return;
-            }
+    getMainConfig().then(config => {
+        applyConfig(config);
+    });
 
-            // Global Alert/MOTD
-            if (config.alertMessage) {
-                const alertBox = document.createElement('div');
-                alertBox.style.cssText = "background:#d32f2f;color:#fff;padding:10px;text-align:center;font-weight:bold;";
-                alertBox.innerText = "⚠️ " + config.alertMessage;
-                document.body.prepend(alertBox);
-            }
+    async function getMainConfig() {
+        let config = {}; // Default empty
 
-            // Check Minecraft Server Status (Live)
-            if (config.serverIp) {
-                fetch(`https://api.mcstatus.io/v2/status/java/${config.serverIp}`)
-                    .then(res => res.json())
-                    .then(status => {
-                        const statusBox = document.querySelector('.ip-box');
-                        if (statusBox) {
-                            if (status.online) {
-                                statusBox.innerHTML = `ONLINE: ${status.players.online}/${status.players.max} GRACZY<br><span style="font-size:0.8em;color:#aaa;">${config.serverIp}</span>`;
-                                statusBox.style.borderColor = "#55ff55";
-                                statusBox.style.color = "#55ff55";
-                            } else {
-                                statusBox.innerHTML = `OFFLINE<br><span style="font-size:0.8em;color:#aaa;">${config.serverIp}</span>`;
-                                statusBox.style.borderColor = "#ff5555";
-                                statusBox.style.color = "#ff5555";
-                            }
-                        }
-                    })
-                    .catch(() => console.warn("Nie udało się pobrać statusu serwera MC."));
+        // 1. Try Supabase (DB)
+        if (typeof _supabase !== 'undefined' && _supabase) {
+            try {
+                const { data, error } = await _supabase.from('system_config').select('key, value');
+                if (!error && data) {
+                    const configObj = {};
+                    data.forEach(row => {
+                        if (row.value === 'true') configObj[row.key] = true;
+                        else if (row.value === 'false') configObj[row.key] = false;
+                        else configObj[row.key] = row.value;
+                    });
+
+                    // Map DB keys to internal keys
+                    config = {
+                        motd: configObj.motd,
+                        serverIp: configObj.server_ip,
+                        maintenance: configObj.maintenance,
+                        alertMessage: configObj.alert_message
+                    };
+                    console.log("Config loaded from Supabase");
+                    return config;
+                }
+            } catch (e) {
+                console.warn("Supabase config fetch failed, falling back to JSON...", e);
             }
-        })
-        .catch(e => {
-            console.error("Critical Config Error:", e);
+        }
+
+        // 2. Fallback to JSON
+        try {
+            const res = await fetch(ROOT + 'site_config.json?nocache=' + Date.now());
+            if (res.ok) {
+                const jsonConfig = await res.json();
+                console.log("Config loaded from JSON file");
+                return jsonConfig;
+            }
+        } catch (e) {
+            console.error("Critical Config Error (JSON):", e);
             // Critical Error Screen
             showErrorScreen(
                 "BŁĄD KRYTYCZNY",
                 "SYSTEM FAILURE",
                 "Nie udało się załadować konfiguracji systemu.<br>Sprawdź połączenie lub skontaktuj się z administratorem."
             );
-        });
+            throw e; // Stop execution
+        }
+        return {};
+    }
+
+    function applyConfig(config) {
+        // Maintenance Check
+        if (config.maintenance) {
+            showErrorScreen(
+                "błąd krytyczny",
+                "PRZERWA TECHNICZNA",
+                config.alertMessage || "Trwają prace konserwacyjne. Serwery są aktualnie wyłączone. Wróć później."
+            );
+            return;
+        }
+
+        // Global Alert/MOTD
+        if (config.alertMessage) {
+            const alertBox = document.createElement('div');
+            alertBox.style.cssText = "background:#d32f2f;color:#fff;padding:10px;text-align:center;font-weight:bold;";
+            alertBox.innerText = "⚠️ " + config.alertMessage;
+            document.body.prepend(alertBox);
+        }
+
+        // Check Minecraft Server Status (Live)
+        if (config.serverIp) {
+            fetch(`https://api.mcstatus.io/v2/status/java/${config.serverIp}`)
+                .then(res => res.json())
+                .then(status => {
+                    const statusBox = document.querySelector('.ip-box');
+                    if (statusBox) {
+                        if (status.online) {
+                            statusBox.innerHTML = `ONLINE: ${status.players.online}/${status.players.max} GRACZY<br><span style="font-size:0.8em;color:#aaa;">${config.serverIp}</span>`;
+                            statusBox.style.borderColor = "#55ff55";
+                            statusBox.style.color = "#55ff55";
+                        } else {
+                            statusBox.innerHTML = `OFFLINE<br><span style="font-size:0.8em;color:#aaa;">${config.serverIp}</span>`;
+                            statusBox.style.borderColor = "#ff5555";
+                            statusBox.style.color = "#ff5555";
+                        }
+                    }
+                })
+                .catch(() => console.warn("Nie udało się pobrać statusu serwera MC."));
+        }
+    }
 
     function showErrorScreen(title, subtitle, message) {
         // Ensure fonts are loaded
