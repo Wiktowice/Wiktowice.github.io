@@ -110,7 +110,6 @@ async function loadFile(context, silent = false) {
 
                 // Map DB keys to App keys
                 db.config = {
-                    motd: configObj.motd || '',
                     serverIp: configObj.server_ip || '',
                     maintenance: configObj.maintenance || false,
                     alertMessage: configObj.alert_message || ''
@@ -165,7 +164,6 @@ function refreshView(context) {
     if (context === 'restaurant') renderRestaurant();
     if (context === 'config') {
         const c = db.config;
-        document.getElementById('conf-motd').value = c.motd || '';
         document.getElementById('conf-ip').value = c.serverIp || '';
         document.getElementById('conf-maint').value = c.maintenance ? 'true' : 'false';
         document.getElementById('conf-alert').value = c.alertMessage || '';
@@ -517,7 +515,6 @@ async function saveToLocal(context) {
         // --- CONFIG SAVE ---
         if (context === 'config') {
             const updates = [
-                { key: 'motd', value: db.config.motd || '' },
                 { key: 'server_ip', value: db.config.serverIp || '' },
                 { key: 'maintenance', value: db.config.maintenance ? 'true' : 'false' },
                 { key: 'alert_message', value: db.config.alertMessage || '' }
@@ -618,7 +615,6 @@ async function uploadToNeocities(filename, contentObj) {
 
 function saveConfig() {
     db.config = {
-        motd: document.getElementById('conf-motd').value,
         serverIp: document.getElementById('conf-ip').value,
         maintenance: document.getElementById('conf-maint').value === 'true',
         alertMessage: document.getElementById('conf-alert').value
