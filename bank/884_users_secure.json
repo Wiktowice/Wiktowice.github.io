@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "login": "rajman",
+        "haslo": "haslo123",
+        "saldo": 100
+    },
+    {
+        "id": 2,
+        "login": "rajman33",
+        "haslo": "test",
+        "saldo": 11
+    }
+]

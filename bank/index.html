@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; media-src 'self'; connect-src 'self' http://localhost:3000 https://*.supabase.co https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;">
+    <title>Bank Wiktowice</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+</head>
+
+<body>
+    <div class="topbar">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="../logobank.png" alt="Logo" style="height:30px;">
+            <span style="color:#FFAA00;">BANK SKARBOWY</span>
+        </div>
+        <div>
+            <a href="../index.html">Strona główna</a>
+            <a href="../admin.html">Admin</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div id="login-window" class="window">
+        <h1 class="animated-title">Logowanie</h1>
+        <input type="text" id="login" placeholder="Login">
+        <input type="password" id="password" placeholder="Hasło">
+        <button id="login-btn">ZALOGUJ</button>
+        <p id="login-error" class="error" style="color:#ff5555; font-size:10px; text-align:center; min-height:15px;">
+        </p>
+
+        <div style="text-align:center; margin-top:10px; padding-top:10px; border-top:2px solid #a0a0a0;">
+            <a href="#" id="show-register-btn" style="font-size:10px; color:#555;">Stwórz nowe konto</a>
+        </div>
+    </div>
+
+    <div id="register-window" class="window" style="display:none;">
+        <h1 class="animated-title">Nowe Konto</h1>
+        <input type="text" id="reg-login" placeholder="Twój Nick...">
+        <input type="password" id="reg-pass" placeholder="Tajne Hasło...">
+        <button id="do-register-btn">UTWÓRZ KONTO</button>
+        <button id="back-to-login-btn">WRÓĆ</button>
+        <p id="register-error" class="error" style="color:#ff5555; text-align:center; font-size:10px;"></p>
+    </div>
+
+    <div id="account-window" class="window" style="display:none;">
+        <h1 class="animated-title">Twoje Konto</h1>
+
+        <div
+            style="background:#8b8b8b; padding:10px; border:2px solid #373737; border-bottom-color:#fff; border-right-color:#fff; margin-bottom:10px;">
+            <div style="font-size:10px; color:#333;">Witaj, obywatelu:</div>
+            <div id="user-name" style="font-size:18px; color:#000; margin-top:5px;">User</div>
+            <div style="font-size:10px; color:#555; margin-top:2px;">ID: <span id="user-id">?</span></div>
+        </div>
+
+        <div
+            style="background:#8b8b8b; padding:10px; border:2px solid #373737; border-bottom-color:#fff; border-right-color:#fff;">
+            <div style="font-size:10px; color:#333;">Aktualne Saldo:</div>
+            <div style="font-size:24px; color:#006400; font-weight:bold; margin-top:5px;">
+                $<span id="user-saldo">0</span>
+            </div>
+        </div>
+
+        <button id="logout-btn" style="margin-top:20px;">WYLOGUJ</button>
+    </div>
+
+    <script src="../script.js"></script>
+    <!-- We might need specific bank script logic if not in script.js. 
+         Wait, looking at previous list_dir, script.js was in root. 
+         Does bank have its own script? No, it uses ../script.js or similar?
+         Wait, previous view of bank/index.html showed <script src="script.js"></script>.
+         Let's check if there is a script.js in /bank/.
+         Ah, list_dir of /bank showed: `884_users_secure.json`, `README.txt`, `admin.html`, `index.html`, `logobank.png`, `script.js`...
+         YES, there is a script.js in bank/ directory. I should import that one.
+    -->
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabase_config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
