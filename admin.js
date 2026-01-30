@@ -1,5 +1,5 @@
 /* --- CONFIG & STATE --- */
-const ADMIN_PASSWORD_HASH = "87ef82428c924c6415451b3e9295bfdabc149e3fc552a5af35565865a2f";
+const DEFAULT_ADMIN_PASSWORD_HASH = "87ef82428c924c6415451b3e9295bfdabc149e3fc552a5af35565865a2f";
 const FILES = {
     news: '739_news_secure.json',
     bank: 'bank_users', // Using table name logic for Supabase
@@ -44,13 +44,34 @@ async function sha256(message) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+async function getAdminPasswordHash() {
+    if (typeof _supabase !== 'undefined' && _supabase) {
+        const { data, error } = await _supabase
+            .from('system_config')
+            .select('value')
+            .eq('key', 'admin_password_hash')
+            .single();
+
+        if (data && data.value) {
+            console.log("Pobrano hasło z Supabase");
+            return data.value;
+        }
+        if (error) {
+            console.warn("Błąd pobierania hasła z Supabase (może brak tabeli system_config?):", error.message);
+        }
+    }
+    console.warn("Używam domyślnego hasła (hardcoded).");
+    return DEFAULT_ADMIN_PASSWORD_HASH;
+}
+
 async function attemptLogin() {
     const pass = document.getElementById('login-pass').value.trim();
     const hash = await sha256(pass);
-    console.log('Login attempt:', pass, 'Hash:', hash);
-    console.log('Expected:', ADMIN_PASSWORD_HASH);
+    const correctHash = await getAdminPasswordHash();
 
-    if (hash === ADMIN_PASSWORD_HASH) {
+    // console.log('Login attempt initiated'); // Debug log removed for security
+
+    if (hash === correctHash) {
         document.getElementById('login-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
@@ -58,7 +79,7 @@ async function attemptLogin() {
             loadAllData();
         }, 500);
     } else {
-        showToast('Odmowa dostępu: Nieprawidłowe hasło (' + hash.substring(0, 8) + '...)', 'error');
+        showToast('Odmowa dostępu: Nieprawidłowe hasło', 'error');
         console.warn("Hash mismatch!");
         document.getElementById('login-pass').value = '';
     }
