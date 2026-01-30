@@ -45,25 +45,23 @@ async function getAdminPassword() {
             .from('system_config')
             .select('value')
             .eq('key', 'admin_password')
-            .single();
+            .maybeSingle();
 
-        if (data && data.value) {
-
-            return data.value;
-        }
         if (error) {
             console.warn("Błąd pobierania hasła z Supabase:", error.message);
+            return null;
+        }
+
+        if (data && data.value) {
+            return data.value;
         }
     }
     return null;
 }
 
-
 async function attemptLogin() {
     const pass = document.getElementById('login-pass').value.trim();
     const correctPass = await getAdminPassword();
-
-    // console.log('Login attempt initiated');
 
     if (!correctPass) {
         showToast('Błąd krytyczny: Nie można pobrać hasła z Supabase. Sprawdź tabelę system_config (klucz: admin_password).', 'error');
@@ -80,7 +78,6 @@ async function attemptLogin() {
         }, 500);
     } else {
         showToast('Odmowa dostępu: Nieprawidłowe hasło', 'error');
-        console.warn("Hash mismatch!");
         document.getElementById('login-pass').value = '';
     }
 }
