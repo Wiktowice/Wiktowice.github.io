@@ -101,8 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Maintenance Check
         if (config.maintenance) {
             showErrorScreen(
-                "błąd krytyczny",
-                "PRZERWA TECHNICZNA",
+                "PRACE TECHNICZNE",
+                "SYSTEM OFFLINE",
                 config.alertMessage || "Trwają prace konserwacyjne. Serwery są aktualnie wyłączone. Wróć później."
             );
             return;
