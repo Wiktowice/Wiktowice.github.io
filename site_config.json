@@ -2,5 +2,6 @@
     "motd": "Witamy w Wiktowicach!",
     "maintenance": false,
     "alertMessage": "",
-    "serverIp": "wiktowice.falixsrv.me"
+    "serverIp": "wiktowice.falixsrv.me",
+    "discordWebhook": "https://discord.com/api/webhooks/1466823573497839619/sd_XImcaLo9h09kfmYAspQY2RLp-7RMnokPMGt7sP6VbG6uPZ0Dxq5lIo1h3VZ32DYZx"
 }

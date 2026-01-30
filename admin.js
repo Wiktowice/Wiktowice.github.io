@@ -75,6 +75,7 @@ async function attemptLogin() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-container').classList.add('logged-in');
             loadAllData();
+            sendDiscordWebhook("🔐 **Admin Login**: Zalogowano do panelu administratora.", 0x00ff00);
         }, 500);
     } else {
         showToast('Odmowa dostępu: Nieprawidłowe hasło', 'error');
@@ -110,6 +111,7 @@ async function loadFile(context, silent = false) {
 
                 // Map DB keys to App keys
                 db.config = {
+                    discordWebhook: configObj.discord_webhook || '',
                     serverIp: configObj.server_ip || '',
                     maintenance: configObj.maintenance || false,
                     alertMessage: configObj.alert_message || ''
@@ -165,6 +167,7 @@ function refreshView(context) {
     if (context === 'config') {
         const c = db.config;
         document.getElementById('conf-ip').value = c.serverIp || '';
+        document.getElementById('conf-webhook').value = c.discordWebhook || '';
         document.getElementById('conf-maint').value = c.maintenance ? 'true' : 'false';
         document.getElementById('conf-alert').value = c.alertMessage || '';
         updateJsonPreview('config');
@@ -516,6 +519,7 @@ async function saveToLocal(context) {
         if (context === 'config') {
             const updates = [
                 { key: 'server_ip', value: db.config.serverIp || '' },
+                { key: 'discord_webhook', value: db.config.discordWebhook || '' },
                 { key: 'maintenance', value: db.config.maintenance ? 'true' : 'false' },
                 { key: 'alert_message', value: db.config.alertMessage || '' }
             ];
@@ -526,6 +530,7 @@ async function saveToLocal(context) {
                 showToast('⚠️ Błąd zapisu konfiguracji: ' + error.message, 'error');
             } else {
                 showToast('✅ Konfiguracja zapisana w chmurze', 'success');
+                sendDiscordWebhook("⚙️ **Config**: Zaktualizowano konfigurację systemu.", 0xffff00);
             }
             return;
         }
@@ -545,6 +550,14 @@ async function saveToLocal(context) {
                 showToast('✅ Zsynchronizowano z chmurą', 'success');
                 if (data) db[context] = data;
                 refreshView(context);
+
+                // Discord Notification for Data Update
+                let msg = `💾 **Update**: Zaktualizowano dane w sekcji **${context.toUpperCase()}**.`;
+                if (context === 'news') msg = `📰 **News**: Dodano/Edytowano post.`;
+                if (context === 'restaurant') msg = `🍔 **Restauracja**: Zaktualizowano status zamówienia.`;
+                if (context === 'bank') msg = `💰 **Bank**: Zmiana w rejestrze bankowym.`;
+
+                sendDiscordWebhook(msg, 0x0099ff);
             }
             return;
         }
@@ -616,6 +629,7 @@ async function uploadToNeocities(filename, contentObj) {
 function saveConfig() {
     db.config = {
         serverIp: document.getElementById('conf-ip').value,
+        discordWebhook: document.getElementById('conf-webhook').value,
         maintenance: document.getElementById('conf-maint').value === 'true',
         alertMessage: document.getElementById('conf-alert').value
     };
@@ -648,4 +662,25 @@ function showToast(msg, type = 'success') {
 function navTo(viewName) {
     const item = document.querySelector(`.nav-item[data-view="${viewName}"]`);
     if (item) item.click();
+}
+
+function sendDiscordWebhook(content, color = 0xffffff) {
+    if (!db.config.discordWebhook) return;
+
+    const payload = {
+        username: "Wiktowice System",
+        avatar_url: "https://wiktowice.github.io/favicon-32x32.png",
+        embeds: [{
+            description: content,
+            color: color,
+            footer: { text: "Wiktowice Admin OS" },
+            timestamp: new Date().toISOString()
+        }]
+    };
+
+    fetch(db.config.discordWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).catch(err => console.warn("Discord Webhook Error:", err));
 }
