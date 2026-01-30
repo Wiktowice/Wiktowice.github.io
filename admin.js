@@ -47,6 +47,8 @@ async function sha256(message) {
 async function attemptLogin() {
     const pass = document.getElementById('login-pass').value.trim();
     const hash = await sha256(pass);
+    console.log('Login attempt:', pass, 'Hash:', hash);
+    console.log('Expected:', ADMIN_PASSWORD_HASH);
 
     if (hash === ADMIN_PASSWORD_HASH) {
         document.getElementById('login-screen').style.opacity = '0';
@@ -56,7 +58,8 @@ async function attemptLogin() {
             loadAllData();
         }, 500);
     } else {
-        showToast('Odmowa dostępu: Nieprawidłowe hasło', 'error');
+        showToast('Odmowa dostępu: Nieprawidłowe hasło (' + hash.substring(0, 8) + '...)', 'error');
+        console.warn("Hash mismatch!");
         document.getElementById('login-pass').value = '';
     }
 }
