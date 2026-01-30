@@ -116,6 +116,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.prepend(alertBox);
         }
 
+        // MOTD (Message of the Day)
+        if (config.motd) {
+            const motdEl = document.getElementById('site-motd');
+            if (motdEl) motdEl.textContent = config.motd;
+        }
+
         // Check Minecraft Server Status (Live)
         if (config.serverIp) {
             fetch(`https://api.mcstatus.io/v2/status/java/${config.serverIp}`)
