@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- CSP -->
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; media-src 'self'; connect-src 'self' http://localhost:3000 https://*.supabase.co https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;">
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; media-src 'self'; connect-src 'self' http://localhost:3000 https://*.supabase.co https://cdn.jsdelivr.net https://api.mcstatus.io; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;">
     <title>Bank Wiktowice</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -15,7 +15,7 @@
 <body>
     <div class="topbar">
         <div style="display:flex; align-items:center; gap:10px;">
-            <img src="../logobank.png" alt="Logo" style="height:30px;">
+            <img src="logobank.png" alt="Logo" style="height:30px;">
             <span style="color:#FFAA00;">BANK SKARBOWY</span>
         </div>
         <div>
