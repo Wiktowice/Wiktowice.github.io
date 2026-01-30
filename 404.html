@@ -116,10 +116,40 @@
             przeniesiona lub nigdy nie istniała.<br>
             Wróć do bezpiecznej strefy.
         </p>
-        <a href="index.html" class="btn">WRÓĆ NA STRONĘ GŁÓWNĄ</a>
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="btn">WRÓĆ NA STRONĘ GŁÓWNĄ</a>
+            <a href="admin.html" class="btn btn-sec">PANEL ADMINA</a>
+        </div>
     </div>
 
-    <!-- Script so it works with SPA router if needed later, but standard 404 for now -->
+    <style>
+        .btn-sec {
+            display: inline-block;
+            padding: 15px 30px;
+            background: transparent;
+            border: 2px solid #555;
+            color: #aaa;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+
+        .btn-sec:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+            color: #fff;
+        }
+    </style>
+
+    <!-- Supabase & Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase_config.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>

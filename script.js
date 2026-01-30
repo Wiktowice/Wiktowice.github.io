@@ -160,7 +160,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h1>${title}</h1>
                 <h2>${subtitle}</h2>
                 <p>${message}</p>
+                <div style="margin-top: 30px;">
+                    <a href="index.html" class="btn">WRÓĆ NA STRONĘ</a>
+                    <a href="admin.html" class="btn btn-sec" style="margin-left:10px; opacity:0.6; font-size:12px;">PANEL ADMINA</a>
+                </div>
             </div>
+            <style>
+                .btn { display: inline-block; padding: 15px 30px; background: #d4a017; color: #000; text-decoration: none; font-weight: bold; border-radius: 8px; text-transform: uppercase; font-family: 'Inter', sans-serif; transition: all 0.2s; border: 2px solid transparent; }
+                .btn:hover { background: #b8860b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 160, 23, 0.3); }
+                .btn-sec { background: transparent; border-color: #555; color: #aaa; padding: 15px 20px; }
+                .btn-sec:hover { background: rgba(255,255,255,0.1); border-color: #fff; color: #fff; box-shadow: none; }
+            </style>
         `;
     }
 
