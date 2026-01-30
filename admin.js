@@ -1,6 +1,5 @@
-
 /* --- CONFIG & STATE --- */
-const PASSWORD_HASH = "2eb302b243fa520f42e6837289c3e3d42cc6380b30668735b7a77893c0397558";
+const ADMIN_PASSWORD = "Wikt0wice@123";
 const FILES = {
     news: '739_news_secure.json',
     bank: 'bank_users', // Using table name logic for Supabase
@@ -38,11 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* --- AUTH --- */
-async function attemptLogin() {
+function attemptLogin() {
     const pass = document.getElementById('login-pass').value;
-    const hash = await sha256(pass);
 
-    if (hash === PASSWORD_HASH) {
+    if (pass === ADMIN_PASSWORD) {
         document.getElementById('login-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('login-screen').style.display = 'none';
@@ -55,11 +53,6 @@ async function attemptLogin() {
     }
 }
 
-async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 /* --- DATA OPS --- */
 function loadAllData() {
