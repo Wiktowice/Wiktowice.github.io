@@ -409,7 +409,9 @@ function closeModal() {
 document.getElementById('modal-save-btn').addEventListener('click', () => {
     try {
         if (currentModalContext === 'news') {
+            const oldItem = currentEditId !== null ? db.news[currentEditId] : {};
             const n = {
+                ...oldItem,
                 title: document.getElementById('inp-title').value,
                 date: document.getElementById('inp-date').value,
                 content: document.getElementById('inp-content').value
@@ -417,7 +419,10 @@ document.getElementById('modal-save-btn').addEventListener('click', () => {
             if (!n.title) throw new Error("Tytuł jest wymagany!");
 
             if (currentEditId !== null) db.news[currentEditId] = n;
-            else db.news.push(n);
+            else {
+                n.id = Date.now(); // Generate ID for new items
+                db.news.push(n);
+            }
         }
         else if (currentModalContext === 'bank') {
             const id = parseInt(document.getElementById('inp-id').value);
@@ -446,14 +451,19 @@ document.getElementById('modal-save-btn').addEventListener('click', () => {
             }
         }
         else if (currentModalContext === 'restaurant') {
+            const oldItem = currentEditId !== null ? db.restaurant[currentEditId] : {};
             const o = {
+                ...oldItem,
                 number: document.getElementById('inp-num').value,
                 status: document.getElementById('inp-status').value
             };
             if (!o.number) throw new Error("Numer zamówienia wymagany!");
 
             if (currentEditId !== null) db.restaurant[currentEditId] = o;
-            else db.restaurant.push(o);
+            else {
+                o.id = Date.now(); // Generate ID for new items
+                db.restaurant.push(o);
+            }
         }
 
         saveToLocal(currentModalContext); // Zapisz na dysku
