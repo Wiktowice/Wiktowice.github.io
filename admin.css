@@ -571,3 +571,91 @@ textarea:focus {
         opacity: 1;
     }
 }
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    #app-container {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px;
+        position: sticky;
+        top: 0;
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+        justify-content: flex-start;
+        gap: 10px;
+        background: #000;
+        /* Solid background for sticky header */
+    }
+
+    .sidebar-header,
+    .sidebar-footer {
+        display: none;
+    }
+
+    .nav-item {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 10px;
+        min-width: 70px;
+        /* ensure touch target size */
+        margin-bottom: 0;
+    }
+
+    .nav-item span {
+        font-size: 20px;
+        /* Bigger icons */
+    }
+
+    .main-content {
+        padding: 15px;
+        height: auto;
+        overflow: visible;
+    }
+
+    /* Adjust grid for Dashboard */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        /* Stack cards */
+    }
+
+    /* Adjust controls in views */
+    .action-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .controls-group {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 600px;
+    }
+
+    /* Modal fixes */
+    .modal {
+        width: 95%;
+        max-height: 90vh;
+    }
+}
