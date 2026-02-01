@@ -4,10 +4,11 @@ const FILES = {
     news: '739_news_secure.json',
     bank: 'bank_users', // Using table name logic for Supabase
     restaurant: 'ogolna_restauracja/992_orders_secure.json',
+    events: 'site_events.json',
     config: 'site_config.json'
 };
 
-let db = { news: [], bank: [], restaurant: [], config: {} };
+let db = { news: [], bank: [], restaurant: [], events: [], config: {} };
 let sortState = { context: null, key: null, dir: 'asc' };
 
 /* --- INIT --- */
@@ -120,13 +121,14 @@ async function loadFile(context, silent = false) {
             }
         }
 
-        // --- DATA TABLES (News, Bank, Restaurant) ---
-        else if (context === 'bank' || context === 'news' || context === 'restaurant') {
+        // --- DATA TABLES (News, Bank, Restaurant, Events) ---
+        else if (context === 'bank' || context === 'news' || context === 'restaurant' || context === 'events') {
             let tableName = 'bank_users';
             if (context === 'news') tableName = 'news';
             if (context === 'restaurant') tableName = 'orders';
+            if (context === 'events') tableName = 'events';
 
-            const orderBy = context === 'bank' ? 'id' : 'id';
+            const orderBy = context === 'bank' ? 'id' : (context === 'events' ? 'date' : 'id');
             const { data, error } = await _supabase.from(tableName).select('*').order(orderBy, { ascending: true });
 
             if (error) {
@@ -164,6 +166,7 @@ function refreshView(context) {
     if (context === 'news') renderNews();
     if (context === 'bank') renderBank();
     if (context === 'restaurant') renderRestaurant();
+    if (context === 'events') renderEvents();
     if (context === 'config') {
         const c = db.config;
         document.getElementById('conf-ip').value = c.serverIp || '';
@@ -179,11 +182,11 @@ async function deleteItem(context, idOrIndex) {
     if (!confirm('Czy na pewno usunąć ten element? Operacja jest nieodwracalna.')) return;
 
     // SUPABASE DELETE
-    if ((context === 'bank' || context === 'news' || context === 'restaurant') && typeof _supabase !== 'undefined' && _supabase) {
+    if ((context === 'bank' || context === 'news' || context === 'restaurant' || context === 'events') && typeof _supabase !== 'undefined' && _supabase) {
         let idToDelete = null;
         if (context === 'bank') {
             idToDelete = idOrIndex;
-        } else if (context === 'news' || context === 'restaurant') {
+        } else if (context === 'news' || context === 'restaurant' || context === 'events') {
             // Get ID from object at index
             const item = db[context][idOrIndex];
             if (item && item.id) idToDelete = item.id;
@@ -193,6 +196,7 @@ async function deleteItem(context, idOrIndex) {
             let tableName = 'bank_users';
             if (context === 'news') tableName = 'news';
             if (context === 'restaurant') tableName = 'orders';
+            if (context === 'events') tableName = 'events';
 
             const { error } = await _supabase.from(tableName).delete().eq('id', idToDelete);
 
@@ -322,6 +326,31 @@ function renderRestaurant() {
 }
 
 /* --- DASHBOARD --- */
+function renderEvents() {
+    const tbody = document.querySelector('#table-events tbody');
+    tbody.innerHTML = '';
+
+    db.events.forEach((e, i) => {
+        // Format date nicely
+        let dateDisplay = e.date;
+        try {
+            const d = new Date(e.date);
+            dateDisplay = d.toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        } catch (err) { }
+
+        tbody.innerHTML += `
+            <tr>
+                <td><span style="font-family:monospace; color:var(--primary);">${dateDisplay}</span></td>
+                <td><strong>${e.title}</strong><br><small style="color:#888;">${e.description || ''}</small></td>
+                <td>
+                    <button class="btn-icon" onclick="openModal('events', ${i})">✏️</button>
+                    <button class="btn-icon" style="color:#ff5555" onclick="deleteItem('events', ${i})">🗑️</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
 function updateDashboard() {
     document.getElementById('stats-news-count').textContent = db.news.length;
     document.getElementById('stats-bank-count').textContent = db.bank.length;
@@ -399,6 +428,13 @@ function openModal(context, id = null) {
                 </select>
             </div>
         `;
+    } else if (context === 'events') {
+        const e = id !== null ? db.events[id] : { title: '', date: '', description: '' };
+        body.innerHTML = `
+            <div class="form-group"><label>Nazwa Wydarzenia</label><input id="inp-event-title" value="${e.title}" placeholder="np. Wybory Burmistrza"></div>
+            <div class="form-group"><label>Data i Godzina</label><input type="datetime-local" id="inp-event-date" value="${e.date}"></div>
+            <div class="form-group"><label>Opis (Opcjonalny)</label><input id="inp-event-desc" value="${e.description}" placeholder="Krótki opis..."></div>
+        `;
     }
 }
 
@@ -463,6 +499,24 @@ document.getElementById('modal-save-btn').addEventListener('click', () => {
             else {
                 o.id = Date.now(); // Generate ID for new items
                 db.restaurant.push(o);
+            }
+        }
+        else if (currentModalContext === 'events') {
+            const oldItem = currentEditId !== null ? db.events[currentEditId] : {};
+            const e = {
+                ...oldItem,
+                title: document.getElementById('inp-event-title').value,
+                date: document.getElementById('inp-event-date').value,
+                description: document.getElementById('inp-event-desc').value
+            };
+
+            if (!e.title) throw new Error("Nazwa wydarzenia jest wymagana!");
+            if (!e.date) throw new Error("Data jest wymagana!");
+
+            if (currentEditId !== null) db.events[currentEditId] = e;
+            else {
+                e.id = Date.now();
+                db.events.push(e);
             }
         }
 
@@ -545,11 +599,12 @@ async function saveToLocal(context) {
             return;
         }
 
-        // --- OTHER DATA SAVE (News, Bank, Restaurant) ---
-        if (context === 'bank' || context === 'news' || context === 'restaurant') {
+        // --- OTHER DATA SAVE (News, Bank, Restaurant, Events) ---
+        if (context === 'bank' || context === 'news' || context === 'restaurant' || context === 'events') {
             let tableName = 'bank_users';
             if (context === 'news') tableName = 'news';
             if (context === 'restaurant') tableName = 'orders';
+            if (context === 'events') tableName = 'events';
 
             const { data, error } = await _supabase.from(tableName).upsert(db[context]).select();
 
@@ -566,6 +621,7 @@ async function saveToLocal(context) {
                 if (context === 'news') msg = `📰 **News**: Dodano/Edytowano post.`;
                 if (context === 'restaurant') msg = `🍔 **Restauracja**: Zaktualizowano status zamówienia.`;
                 if (context === 'bank') msg = `💰 **Bank**: Zmiana w rejestrze bankowym.`;
+                if (context === 'events') msg = `📅 **Event**: Zaktualizowano kalendarz wydarzeń.`;
 
                 sendDiscordWebhook(msg, 0x0099ff);
             }

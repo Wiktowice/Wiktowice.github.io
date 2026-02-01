@@ -50,6 +50,9 @@
             <div class="nav-item" data-view="restaurant">
                 <span>🍔</span> Restauracja
             </div>
+            <div class="nav-item" data-view="events">
+                <span>📅</span> Wydarzenia
+            </div>
             <div class="nav-item" data-view="config">
                 <span>⚙️</span> Konfiguracja
             </div>
@@ -207,6 +210,35 @@
                         </table>
                     </div>
 
+                </div>
+            </section>
+
+            <!-- EVENTS VIEW -->
+            <section id="view-events" class="view-section">
+                <div class="action-header">
+                    <div>
+                        <h2 class="pixel-font" style="font-size:20px; margin:0;">Kalendarz Wydarzeń</h2>
+                        <p style="margin:5px 0 0; color:#888; font-size:12px;">Planuj eventy i odliczanie na stronie</p>
+                    </div>
+                    <div class="controls-group">
+                        <button class="btn" onclick="openModal('events')">➕ Dodaj Event</button>
+                        <button class="btn-icon" onclick="loadFile('events')" title="Wczytaj">📥</button>
+                    </div>
+                </div>
+
+                <div class="split-view">
+                    <div class="table-wrapper">
+                        <table id="table-events">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortData('events', 'date')">Data ↕</th>
+                                    <th onclick="sortData('events', 'title')">Wydarzenie ↕</th>
+                                    <th style="width: 100px;">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
