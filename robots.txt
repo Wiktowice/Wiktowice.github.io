@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://wiktowice.github.io/sitemap.xml
