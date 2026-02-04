@@ -1,4 +1,42 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- IP BAN SYSTEM ---
+    async function checkIpBan() {
+        try {
+            // Get user's IP from a public API
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            if (!ipRes.ok) return;
+            const { ip } = await ipRes.json();
+
+            // Get banned IPs from our JSON file
+            const banRes = await fetch(ROOT + 'banned_ips.json?nocache=' + Date.now());
+            if (!banRes.ok) return;
+            const { banned_ips } = await banRes.json();
+
+            if (banned_ips && banned_ips.includes(ip)) {
+                showErrorScreen(
+                    "DOSTĘP ZABLOKOWANY",
+                    "TWOJE IP JEST ZBANOWANE",
+                    "Zostałeś zablokowany przez administratora systemu.<br>Jeśli uważasz to za błąd, skontaktuj się na Discordzie."
+                );
+                // Throwing error to stop further execution of the script
+                throw new Error("Banned IP: " + ip);
+            }
+        } catch (e) {
+            if (e.message.startsWith("Banned IP")) throw e;
+            console.warn("IP Check failed or skipped:", e);
+        }
+    }
+
+    // Detect if we are in a subdirectory (like /bank/ or /ogolna_restauracja/)
+    const isSubPage = window.location.pathname.includes('/bank/') ||
+        window.location.pathname.includes('/ogolna_restauracja/') ||
+        window.location.pathname.includes('/idea/');
+
+    // Set ROOT prefix accordingly
+    const ROOT = isSubPage ? '../' : '';
+
+    // Run IP check immediately
+    await checkIpBan();
     // --- SECURITY & ANTI-DEBUG ---
     // Disable Right Click
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -20,13 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // console.clear(); // Opcjonalnie: czyści, ale wiadomość ostrzegawcza jest lepsza
     }, 2000);
 
-    // Detect if we are in a subdirectory (like /bank/ or /ogolna_restauracja/)
-    const isSubPage = window.location.pathname.includes('/bank/') ||
-        window.location.pathname.includes('/ogolna_restauracja/') ||
-        window.location.pathname.includes('/idea/');
-
-    // Set ROOT prefix accordingly
-    const ROOT = isSubPage ? '../' : '';
 
     // --- Powiadomienia ---
     const notificationTrigger = document.getElementById('notification-trigger');
