@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function deleteUser(id) {
-        if (!confirm(`Czy na pewno usunąć użytkownika ID ${id}?`)) return;
+
 
         users = users.filter(u => u.id !== id);
         renderTable();

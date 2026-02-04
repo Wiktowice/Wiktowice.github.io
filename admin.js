@@ -179,7 +179,7 @@ function refreshView(context) {
 }
 
 async function deleteItem(context, idOrIndex) {
-    if (!confirm('Czy na pewno usunąć ten element? Operacja jest nieodwracalna.')) return;
+
 
     // SUPABASE DELETE
     if ((context === 'bank' || context === 'news' || context === 'restaurant' || context === 'events') && typeof _supabase !== 'undefined' && _supabase) {
@@ -532,7 +532,7 @@ document.getElementById('modal-save-btn').addEventListener('click', () => {
 });
 
 async function deleteItem(context, idOrIndex) {
-    if (!confirm('Czy na pewno usunąć ten element? Operacja jest nieodwracalna.')) return;
+
 
     // SUPABASE DELETE
     if ((context === 'bank' || context === 'news') && typeof _supabase !== 'undefined' && _supabase) {
