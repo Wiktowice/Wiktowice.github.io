@@ -21,6 +21,11 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; media-src 'self'; connect-src 'self' http://localhost:3000 https://*.supabase.co https://cdn.jsdelivr.net https://api.mcstatus.io https://discord.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;">
+    <!-- Legacy Browser Support Polyfills -->
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-shim@0.35.6/es6-shim.min.js"></script>
+
     <title>Wiktowice Admin OS 2.1</title>
     <link rel="stylesheet" href="admin.css">
 </head>

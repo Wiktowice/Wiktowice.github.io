@@ -23,11 +23,58 @@
     box-sizing: border-box;
 }
 
+/* Fallbacks for Old Browsers */
+.sidebar {
+    background-color: #0f0f0f !important;
+}
+
+.main-content {
+    background-color: #000 !important;
+}
+
+.stat-card {
+    background-color: #1e1e1e !important;
+}
+
+.btn {
+    background-color: #d4a017 !important;
+    color: #000 !important;
+}
+
+.btn-secondary {
+    background-color: #333 !important;
+    color: #fff !important;
+}
+
+.nav-item.active {
+    background-color: #d4a017 !important;
+    color: #000 !important;
+}
+
+input,
+select,
+textarea {
+    background-color: #252525 !important;
+    color: #fff !important;
+}
+
+table th {
+    background-color: #000 !important;
+}
+
+.modal {
+    background-color: #181818 !important;
+}
+
 body {
     margin: 0;
+    font-family: 'Inter', sans-serif;
+    /* Fallback for var(--font-ui) */
     font-family: var(--font-ui);
     background: #000 url('tlo.png') no-repeat center center fixed;
     background-size: cover;
+    color: #e0e0e0;
+    /* Fallback for var(--text) */
     color: var(--text);
     height: 100vh;
     overflow: hidden;
@@ -67,7 +114,10 @@ h3,
 /* --- AUTH SCREEN --- */
 #login-screen {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(10px);
     z-index: 9999;
@@ -134,6 +184,11 @@ h3,
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+.nav-item span {
+    margin-right: 12px;
+    /* Fallback for gap */
 }
 
 .nav-item:hover {
