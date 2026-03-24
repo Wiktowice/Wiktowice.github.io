@@ -1,30 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // --- IP BAN SYSTEM ---
+    // ⚠️ SECURITY: IP ban system disabled - banned_ips.json removed for security
+    // Move IP bans to Supabase table with RLS (admin-only read access)
     async function checkIpBan() {
-        try {
-            // Get user's IP from a public API
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            if (!ipRes.ok) return;
-            const { ip } = await ipRes.json();
-
-            // Get banned IPs from our JSON file
-            const banRes = await fetch(ROOT + 'banned_ips.json?nocache=' + Date.now());
-            if (!banRes.ok) return;
-            const { banned_ips } = await banRes.json();
-
-            if (banned_ips && banned_ips.includes(ip)) {
-                showErrorScreen(
-                    "DOSTĘP ZABLOKOWANY",
-                    "TWOJE IP JEST ZBANOWANE",
-                    "Zostałeś zablokowany przez administratora systemu.<br>Jeśli uważasz to za błąd, skontaktuj się na Discordzie."
-                );
-                // Throwing error to stop further execution of the script
-                throw new Error("Banned IP: " + ip);
-            }
-        } catch (e) {
-            if (e.message.startsWith("Banned IP")) throw e;
-            console.warn("IP Check failed or skipped:", e);
-        }
+        // DISABLED - Implement in Supabase with proper RLS policies
+        // Example: SELECT ip FROM banned_ips WHERE ip = user_ip AND auth.uid() IS NOT NULL
+        return;
     }
 
     // Detect if we are in a subdirectory (like /bank/ or /ogolna_restauracja/)
@@ -37,26 +18,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Run IP check immediately
     await checkIpBan();
-    // --- SECURITY & ANTI-DEBUG ---
-    // Disable Right Click
-    document.addEventListener('contextmenu', event => event.preventDefault());
 
-    // Disable DevTools shortcuts
-    document.addEventListener('keydown', function (event) {
-        if (event.key === "F12" ||
-            (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J' || event.key === 'C')) ||
-            (event.ctrlKey && event.key === 'U')) {
-            event.preventDefault();
-            return false;
-        }
-    });
-
-    // Clear Console periodically
-    setInterval(() => {
-        console.log("%cStop!", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px #000;");
-        console.log("%cTo jest funkcja przeglądarki przeznaczona dla programistów. Jeśli ktoś kazał Ci coś tutaj wkleić/wpisać, to próbuje Cię oszukać.", "font-size: 20px;");
-        // console.clear(); // Opcjonalnie: czyści, ale wiadomość ostrzegawcza jest lepsza
-    }, 2000);
+    // ⚠️ SECURITY NOTE: DevTools blocking removed
+    // Blocking F12/right-click provides no real security and only frustrates users.
+    // Real security comes from proper server-side auth and RLS policies.
 
 
     // --- Powiadomienia ---

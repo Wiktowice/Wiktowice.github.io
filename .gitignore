@@ -9,3 +9,13 @@ supabase_config.js
 .env.development
 secrets/
 keys/
+
+# Data files with sensitive information
+banned_ips.json
+*_secure.json
+bank/*_secure.json
+**/users_secure.json
+
+# Database exports
+*.sql
+!SECURITY_SETUP.sql

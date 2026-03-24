@@ -205,7 +205,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ---- ADMIN AREA ----
-    const ADMIN_HASH = "5fc30dc0d520f847a3eabb9f3b47db7b596ad2df95660de1ec37a8c62a63d542"; // "Wiktowice@123"
+    // ⚠️ SECURITY WARNING: Client-side admin auth is INSECURE!
+    // Migrate to Supabase Auth with role-based access control.
+    // Password hash removed for security - use Supabase Auth instead.
+    const ADMIN_HASH = ""; // DISABLED - Use Supabase Auth
 
     async function sha256(message) {
         const msgBuffer = new TextEncoder().encode(message);
@@ -221,17 +224,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const pw = pwInput.value.trim();
         const errorElem = document.getElementById("admin-error");
 
-        const hash = await sha256(pw);
+        // ⚠️ SECURITY: Admin auth disabled - use Supabase Auth instead
+        errorElem.textContent = "⚠️ Admin login disabled. Use Supabase Auth (see SECURITY.md)";
 
-        if (hash === ADMIN_HASH) {
-            document.getElementById("admin-login").style.display = "none";
-            document.getElementById("admin-panel").style.display = "block";
-            renderTable();
-            updateJsonOutput();
-            errorElem.textContent = "";
-        } else {
-            errorElem.textContent = "Błędne hasło admina!";
-        }
+        // Legacy code removed for security:
+        // const hash = await sha256(pw);
+        // if (hash === ADMIN_HASH) { ... }
     }
 
     // --- CRUD OPERATIONS ---
