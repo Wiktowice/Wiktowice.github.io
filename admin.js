@@ -50,6 +50,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /* --- AUTH --- */
 
+// Check if Supabase Auth is available
+function isSupabaseAuthAvailable() {
+    return typeof _supabase !== 'undefined' && _supabase && _supabase.auth;
+}
+
+// Show Supabase Auth button if available
+function checkSupabaseAuth() {
+    if (isSupabaseAuthAvailable()) {
+        var supabaseLoginBtn = document.getElementById('supabase-login-btn');
+        if (supabaseLoginBtn) {
+            supabaseLoginBtn.style.display = 'flex';
+        }
+
+        // Check if user is already logged in via Supabase Auth
+        _supabase.auth.getSession().then(function (_a) {
+            var data = _a.data;
+            var error = _a.error;
+            if (data && data.session) {
+                // User is authenticated via Supabase Auth
+                console.log("✅ User authenticated via Supabase Auth");
+                performSecureLogin();
+            }
+        });
+    }
+}
 
 function getAdminPassword() {
     if (typeof _supabase !== 'undefined' && _supabase) {
@@ -94,6 +119,43 @@ function attemptLogin() {
         } else {
             showToast('Odmowa dostępu: Nieprawidłowe hasło', 'error');
             document.getElementById('login-pass').value = '';
+        }
+    });
+}
+
+// Secure login using Supabase Auth (recommended)
+function performSecureLogin() {
+    document.getElementById('login-screen').style.opacity = '0';
+    setTimeout(function () {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-container').classList.add('logged-in');
+        loadAllData();
+        sendDiscordWebhook("🔐 **Secure Admin Login**: Zalogowano przez Supabase Auth.", 0x00ff00);
+    }, 500);
+}
+
+// Supabase Auth login handler
+function handleSupabaseLogin() {
+    if (!isSupabaseAuthAvailable()) {
+        showToast('Supabase Auth nie jest dostępne. Skonfiguruj Authentication w Supabase.', 'error');
+        return;
+    }
+
+    var email = prompt("Podaj email:");
+    if (!email) return;
+
+    var password = prompt("Podaj hasło:");
+    if (!password) return;
+
+    _supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+    }).then(function (res) {
+        if (res.error) {
+            showToast('Błąd logowania: ' + res.error.message, 'error');
+        } else {
+            showToast('✅ Zalogowano przez Supabase Auth!', 'success');
+            performSecureLogin();
         }
     });
 }

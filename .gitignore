@@ -1,3 +1,11 @@
 node_modules/
 .env
 .DS_Store
+
+# SECURITY - Never commit sensitive files
+supabase_config.js
+*.env.local
+.env.production
+.env.development
+secrets/
+keys/
